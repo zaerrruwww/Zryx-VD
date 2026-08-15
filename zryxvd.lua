@@ -1,16 +1,25 @@
 ﻿-- LOAD LIB
 local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
 
--- Xeno quirk fix: HttpGet added to game by Xeno can break scripts
-if getgenv and not getgenv().game then
-    getgenv().game = workspace.Parent or game
+-- Xeno fix: game:HttpGet is broken in Xeno, use request/syn.request first
+local function Fetch(Url)
+    local requestFn = request or syn.request or http_request
+    if requestFn then
+        local ok, res = pcall(function()
+            return requestFn({ Url = Url })
+        end)
+        if ok and res and (res.StatusCode == 200 or res.StatusCode == 304) then
+            return res.Body or res.body
+        end
+    end
+    return game:HttpGet(Url)
 end
 
 local function TryLoad(Url, Retries)
     Retries = Retries or 3
     for i = 1, Retries do
         local ok, result = pcall(function()
-            return loadstring(game:HttpGet(Url))()
+            return loadstring(Fetch(Url))()
         end)
         if ok and result then return result end
         task.wait(0.5)
