@@ -1508,7 +1508,7 @@ task.spawn(function()
 
                     GunAim.Holding = false
                 end
-            end
+            end)
         end
     end
 end)
