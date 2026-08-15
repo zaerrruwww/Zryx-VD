@@ -299,6 +299,8 @@ SlowSpeed = 13,
 UseSlow = true
 }
 
+local MoonwalkSmoothYaw = 0
+
 local CameraZoom = {
     UnlimitedZoom = false,
     MaxDistance = 1000,
@@ -2374,18 +2376,28 @@ RunService.RenderStepped:Connect(function()
                     -- REVERSE MOONWALK: badan menghadap lawan arah gerak
                     -- maju (W) -> badan menghadap mundur, tetap meluncur ke depan
                     -- mundur (S) -> badan menghadap depan, tetap meluncur ke belakang
-                    local faceDir
+                    local targetFace = flatLook
                     if move then
                         if move == flatLook then
-                            faceDir = -flatLook
+                            targetFace = -flatLook
                         else
-                            faceDir = flatLook
+                            targetFace = flatLook
                         end
+                    end
 
-                        local baseCF = CFrame.new(hrp.Position, hrp.Position + faceDir)
+                    -- SMOOTH: interpolasi arah hadap supaya pergantian W/S halus
+                    local targetYaw = math.atan2(targetFace.X, -targetFace.Z)
+                    local delta = (targetYaw - MoonwalkSmoothYaw + math.pi) % (2 * math.pi) - math.pi
+                    MoonwalkSmoothYaw = MoonwalkSmoothYaw + delta * 0.15
+
+                    local baseCF = CFrame.new(hrp.Position) * CFrame.Angles(0, MoonwalkSmoothYaw, 0)
+
+                    if move then
                         local angle = math.sin(tick() * Moonwalk.SpamSpeed) * Moonwalk.Intensity
                         hrp.CFrame = baseCF * CFrame.Angles(0, math.rad(angle), 0)
                         humanoid:Move(move, false)
+                    else
+                        hrp.CFrame = baseCF
                     end
                 end
             end
