@@ -1,154 +1,105 @@
 -- LOAD LIB
-local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
-local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
-local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
-local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
 -- =======================================
-Library.Scheme.AccentColor     = Color3.fromRGB(90, 120, 210)
-Library.Scheme.BackgroundColor = Color3.fromRGB(15, 15, 20)
-Library.Scheme.MainColor       = Color3.fromRGB(55, 60, 80)
-Library.Scheme.OutlineColor    = Color3.fromRGB(70, 85, 130)
-Library.Scheme.FontColor       = Color3.fromRGB(200, 215, 255)
--- =======================================
--- FALLENS TOGGLE MENU
-local function CreateZryxVdToggleMenu(IconId)
+WindUI:AddTheme({
+    Name = "Dark",
 
-    local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Name = "ZryxVdToggle"
-    ScreenGui.ResetOnSpawn = false
-    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    ScreenGui.Parent = game:GetService("CoreGui")
-
-    local MainButton = Instance.new("TextButton")
-    MainButton.Name = "ToggleButton"
-    MainButton.Text = ""
-    MainButton.AutoButtonColor = false
-
-    MainButton.Size = UDim2.fromOffset(40,40)
-    MainButton.Position = UDim2.fromOffset(15,120)
-
-    MainButton.BackgroundColor3 = Color3.fromRGB(18,18,22)
-    MainButton.BackgroundTransparency = 0.05
-
-    MainButton.Parent = ScreenGui
-
-    -- Corner
-    local Corner = Instance.new("UICorner")
-    Corner.CornerRadius = UDim.new(1,0)
-    Corner.Parent = MainButton
-
-    -- ZryxVd Outline
-    local Stroke = Instance.new("UIStroke")
-    Stroke.Color = Color3.fromRGB(70,85,130)
-    Stroke.Thickness = 1
-    Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-    Stroke.Parent = MainButton
-
-    -- Glow
-    local Glow = Instance.new("UIStroke")
-    Glow.Color = Color3.fromRGB(45,75,145)
-    Glow.Thickness = 5
-    Glow.Transparency = 0.7
-    Glow.Parent = MainButton
-
-    -- Icon Holder
-    local IconFrame = Instance.new("Frame")
-    IconFrame.Size = UDim2.fromScale(.8,.8)
-    IconFrame.Position = UDim2.fromScale(.1,.1)
-    IconFrame.BackgroundTransparency = 1
-    IconFrame.Parent = MainButton
-
-    local Icon = Library:GetCustomIcon(IconId)
-
-    if Icon then
-
-        local Image = Instance.new("ImageLabel")
-        Image.BackgroundTransparency = 1
-
-        Image.Image = Icon.Url
-        Image.ImageRectOffset = Icon.ImageRectOffset
-        Image.ImageRectSize = Icon.ImageRectSize
-
-        Image.Size = UDim2.fromScale(1,1)
-
-        Image.Parent = IconFrame
-    end
-
-    -- Hover Effect
-    MainButton.MouseEnter:Connect(function()
-        game:GetService("TweenService"):Create(
-            MainButton,
-            TweenInfo.new(.15),
-            {
-                BackgroundColor3 = Color3.fromRGB(28,28,35)
-            }
-        ):Play()
-    end)
-
-    MainButton.MouseLeave:Connect(function()
-        game:GetService("TweenService"):Create(
-            MainButton,
-            TweenInfo.new(.15),
-            {
-                BackgroundColor3 = Color3.fromRGB(18,18,22)
-            }
-        ):Play()
-    end)
-
-    -- Click Animation
-    MainButton.MouseButton1Click:Connect(function()
-
-        game:GetService("TweenService"):Create(
-            MainButton,
-            TweenInfo.new(.08),
-            {
-                Size = UDim2.fromOffset(35 ,35)
-            }
-        ):Play()
-
-        task.wait(.08)
-
-        game:GetService("TweenService"):Create(
-            MainButton,
-            TweenInfo.new(.08),
-            {
-                Size = UDim2.fromOffset(40,40)
-            }
-        ):Play()
-
-        Library:Toggle()
-    end)
-
-    -- Drag
-    Library:MakeDraggable(MainButton, MainButton, true)
-
-    return MainButton, ScreenGui
-end
-
-CreateZryxVdToggleMenu(93349170559446)
+    Accent = Color3.fromHex("#18181b"),
+    Background = Color3.fromHex("#101010"),
+    Outline = Color3.fromHex("#FFFFFF"),
+    Text = Color3.fromHex("#FFFFFF"),
+    Placeholder = Color3.fromHex("#7a7a7a"),
+    Button = Color3.fromHex("#52525b"),
+    Icon = Color3.fromHex("#a1a1aa"),
+})
 -- =======================================
 -- WINDOW
-local Window = Library:CreateWindow({
-Title = "",
-Footer = "Violence District - Freemium",
-Icon = 93349170559446,
-IconSize = UDim2.fromOffset(40, 40),
-CornerRadius = 20,
-NotifySide = "Right",
-ShowCustomCursor = true,
-ShowMobileButtons = false,
-ToggleKeybind = Enum.KeyCode.LeftControl,
-Size = UDim2.fromOffset(400, 300),
-EnableSidebarResize = false,
-EnableCompacting = true,
-SidebarCompacted = true,
+local Window = WindUI:CreateWindow({
+    Title   = "ZRYX VD",
+    Author  = "Violence District - Freemium",
+    Folder  = "zryxvd",
+    Icon    = "zap",
+    Theme   = "Dark",
+    Acrylic = true,
+    Transparent = true,
+    Background = "rbxassetid://84152360484913",
+    Size    = UDim2.fromOffset(680, 460),
+    MinSize = Vector2.new(560, 350),
+    MaxSize = Vector2.new(850, 560),
+    ToggleKey  = Enum.KeyCode.RightShift,
+    Resizable  = true,
+    AutoScale  = true,
+    NewElements = true,
+    BackgroundImageTransparency = 0.65,
+    HideSearchBar = false,
+    ScrollBarEnabled = false,
+    SideBarWidth = 200,
+    Topbar = {
+        Height      = 44,
+        ButtonsType = "Default",
+    },
+    OpenButton = {
+        Title = "ZRYX VD",
+        Icon = "zap",
+        CornerRadius = UDim.new(1, 0),
+        StrokeThickness = 3,
+        Enabled = true,
+        Draggable = true,
+        OnlyMobile = false,
+        Scale = 1,
+        Color = ColorSequence.new(
+            Color3.fromHex("#000000"),
+            Color3.fromHex("#000000")
+        ),
+    },
+    User = {
+        Enabled  = true,
+        Anonymous = false,
+        Callback = function()
+            print("user panel clicked")
+        end,
+    },
 })
 
 local Stats = game:GetService("Stats")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
-local Watermark = Library:AddDraggableLabel("ZRYX VD")
+-- Custom watermark (WindUI has no draggable label)
+local WatermarkGui = Instance.new("ScreenGui")
+WatermarkGui.Name = "ZryxVdWatermark"
+WatermarkGui.ResetOnSpawn = false
+WatermarkGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+WatermarkGui.Parent = game:GetService("CoreGui")
+
+local WatermarkLabel = Instance.new("TextLabel")
+WatermarkLabel.Size = UDim2.fromOffset(240, 26)
+WatermarkLabel.Position = UDim2.new(0.5, -120, 0, 12)
+WatermarkLabel.BackgroundColor3 = Color3.fromRGB(16, 16, 20)
+WatermarkLabel.BackgroundTransparency = 0.2
+WatermarkLabel.Text = "ZRYX VD"
+WatermarkLabel.TextColor3 = Color3.fromRGB(200, 215, 255)
+WatermarkLabel.TextSize = 14
+WatermarkLabel.Font = Enum.Font.GothamBold
+local WmCorner = Instance.new("UICorner")
+WmCorner.CornerRadius = UDim.new(1, 0)
+WmCorner.Parent = WatermarkLabel
+WatermarkLabel.Parent = WatermarkGui
+
+local Watermark = {
+    Visible = true,
+    SetText = function(self, text)
+        WatermarkLabel.Text = text
+    end,
+}
+setmetatable(Watermark, {
+    __newindex = function(self, key, value)
+        rawset(self, key, value)
+        if key == "Visible" then
+            WatermarkLabel.Visible = value
+        end
+    end,
+})
 
 local FPS = 0
 local Frames = 0
@@ -177,37 +128,43 @@ RunService.RenderStepped:Connect(function()
 end)
 
 -- TABS
-local Tabs = {
-Info = Window:AddTab("Info", "info"),
-ESP = Window:AddTab("ESP", "eye"),
-Player = Window:AddTab("Player", "user"),
-Misc = Window:AddTab("Misc", "sliders-horizontal"),
-Visual = Window:AddTab("Visual", "sparkles"),
-UISettings = Window:AddTab("UI Settings", "settings-2")
-}
+local Tabs = {}
+Tabs.Info = Window:Tab({ Title = "Info", Icon = "info" })
+Tabs.ESP = Window:Tab({ Title = "ESP", Icon = "eye" })
 
--- GROUPBOXES
-local InfoBox = Tabs.Info:AddLeftGroupbox("Script Info", "info")
-local CreditsBox = Tabs.Info:AddRightGroupbox("Credits", "user")
-local ESPBox = Tabs.ESP:AddLeftGroupbox("ESP Cham", "scan-eye")
-local ESPStatusBox = Tabs.ESP:AddRightGroupbox("ESP Status", "scan-eye")
+local PlayerSection = Window:Section({ Title = "Player", Opened = true })
+Tabs.Survivor = PlayerSection:Tab({ Title = "Survivor", Icon = "user" })
+Tabs.Killer = PlayerSection:Tab({ Title = "Killer", Icon = "skull" })
+Tabs.AimBot = PlayerSection:Tab({ Title = "AimBot", Icon = "crosshair" })
+Tabs.Parry = PlayerSection:Tab({ Title = "Parry", Icon = "swords" })
+Tabs.Crosshair = PlayerSection:Tab({ Title = "Crosshair", Icon = "crosshair" })
 
--- Right TABBOX
-local RightTabBox = Tabs.Player:AddRightTabbox()
-local AbilityTab = RightTabBox:AddTab("Survivor", "user")
-local KillerTab = RightTabBox:AddTab("Killer", "skull")
-local AimlockBox = Tabs.Player:AddLeftGroupbox("AimBot", "crosshair")
-local ParryBox = Tabs.Player:AddLeftGroupbox("Parry", "swords")
-local CrosshairBox = Tabs.Player:AddLeftGroupbox("Crosshair", "crosshair")
-local MovementBox = Tabs.Misc:AddLeftGroupbox("Movement", "move")
-local EmoteBox =
-    Tabs.Misc:AddRightGroupbox("Emote", "music")
-local FunBox = Tabs.Misc:AddRightGroupbox("fun", "smile")
-local VisualBox = Tabs.Visual:AddLeftGroupbox("Graphics", "sun")
-local MorphAvaBox = Tabs.Visual:AddLeftGroupbox("Morph Avatar", "user")
-local TimeBox = Tabs.Visual:AddRightGroupbox("Clock & Ambient", "alarm-clock-check")
-local ZoomBox = Tabs.Visual:AddRightGroupbox("Zoom Out", "fullscreen")
-local SettingBox = Tabs.UISettings:AddLeftGroupbox("Menu", "wrench")
+local MiscSection = Window:Section({ Title = "Misc", Opened = true })
+Tabs.Movement = MiscSection:Tab({ Title = "Movement", Icon = "move" })
+Tabs.Emote = MiscSection:Tab({ Title = "Emote", Icon = "music" })
+Tabs.Fun = MiscSection:Tab({ Title = "Fun", Icon = "smile" })
+
+Tabs.Visual = Window:Tab({ Title = "Visual", Icon = "sparkles" })
+Tabs.UISettings = Window:Tab({ Title = "UI Settings", Icon = "settings" })
+
+-- SECTIONS (in-tab collapsible boxes)
+local InfoBox = Tabs.Info:Section({ Title = "Script Info", Opened = true })
+local CreditsBox = Tabs.Info:Section({ Title = "Credits", Opened = true })
+local ESPBox = Tabs.ESP:Section({ Title = "ESP Cham", Opened = true })
+local ESPStatusBox = Tabs.ESP:Section({ Title = "ESP Status", Opened = true })
+local AbilityTab = Tabs.Survivor
+local KillerTab = Tabs.Killer
+local AimlockBox = Tabs.AimBot:Section({ Title = "AimBot", Opened = true })
+local ParryBox = Tabs.Parry:Section({ Title = "Parry", Opened = true })
+local CrosshairBox = Tabs.Crosshair:Section({ Title = "Crosshair", Opened = true })
+local MovementBox = Tabs.Movement:Section({ Title = "Movement", Opened = true })
+local EmoteBox = Tabs.Emote:Section({ Title = "Emote", Opened = true })
+local FunBox = Tabs.Fun:Section({ Title = "Fun", Opened = true })
+local VisualBox = Tabs.Visual:Section({ Title = "Graphics", Opened = true })
+local MorphAvaBox = Tabs.Visual:Section({ Title = "Morph Avatar", Opened = true })
+local TimeBox = Tabs.Visual:Section({ Title = "Clock & Ambient", Opened = true })
+local ZoomBox = Tabs.Visual:Section({ Title = "Zoom Out", Opened = true })
+local SettingBox = Tabs.UISettings:Section({ Title = "Menu", Opened = true })
 
 -- SERVICES
 local Players = game:GetService("Players")
@@ -3067,241 +3024,261 @@ end
 
 -- ================= UI ================
 -- INFO
-InfoBox:AddLabel("Script: Freemium")
-InfoBox:AddLabel("Version: 2.0.0")
-InfoBox:AddLabel("Game: Violence District")
-InfoBox:AddLabel("Dev: â€¢à¼¶amillà¼¶â€¢")
-InfoBox:AddLabel("Join discord for more info")
-InfoBox:AddLabel("Discord:")
-InfoBox:AddButton("Copy Discord Link", function()
-    setclipboard("https://discord.gg/52KS4yCD2")
-    Library:Notify({
-        Title = "Discord link copied!",
-        Duration = 3
-    })
-end)
+InfoBox:Paragraph({ Title = "Script: Freemium" })
+InfoBox:Paragraph({ Title = "Version: 2.0.0" })
+InfoBox:Paragraph({ Title = "Game: Violence District" })
+InfoBox:Paragraph({ Title = "Dev: â€¢à¼¶amillà¼¶â€¢" })
+InfoBox:Paragraph({ Title = "Join discord for more info" })
+InfoBox:Paragraph({ Title = "Discord:" })
+InfoBox:Button({
+    Title = "Copy Discord Link",
+    Callback = function()
+        setclipboard("https://discord.gg/52KS4yCD2")
+        WindUI:Notify({
+            Title = "Discord link copied!",
+            Duration = 3
+        })
+    end
+})
 
 -- CREDITS
-CreditsBox:AddLabel("Developer:")
-CreditsBox:AddLabel("- zryx vd")
-CreditsBox:AddDivider()
-CreditsBox:AddLabel("Library:")
-CreditsBox:AddLabel("- Obsidian UI")
-CreditsBox:AddDivider()
-CreditsBox:AddLabel("Support the dev:")
-CreditsBox:AddButton("Copy Support Link", function()
-    setclipboard("https://sociabuzz.com/amill_al/tribe")
-    Library:Notify({
-        Title = "Thanks for the support!",
-        Duration = 3
-    })
-end)
+CreditsBox:Paragraph({ Title = "Developer:" })
+CreditsBox:Paragraph({ Title = "- zryx vd" })
+CreditsBox:Divider()
+CreditsBox:Paragraph({ Title = "Library:" })
+CreditsBox:Paragraph({ Title = "- WindUI" })
+CreditsBox:Divider()
+CreditsBox:Paragraph({ Title = "Support the dev:" })
+CreditsBox:Button({
+    Title = "Copy Support Link",
+    Callback = function()
+        setclipboard("https://sociabuzz.com/amill_al/tribe")
+        WindUI:Notify({
+            Title = "Thanks for the support!",
+            Duration = 3
+        })
+    end
+})
 
 -- ================= ESP =================
-local SurvivorESP = ESPBox:AddCheckbox("SurvivorESP", {
-    Text = "ESP Survivor",
-    Default = false,
+ESPBox:Toggle({
+    Flag = "SurvivorESP",
+    Title = "ESP Survivor",
+    Value = false,
+    Type = "Checkbox",
     Callback = function(v)
         ESP.Survivor = v
     end
 })
 
-SurvivorESP:AddColorPicker("SurvivorESPColor", {
-    Default = TeamColors.Survivor,
+ESPBox:Colorpicker({
+    Flag = "SurvivorESPColor",
     Title = "Survivor Color",
-
+    Default = TeamColors.Survivor,
     Callback = function(color)
         TeamColors.Survivor = color
     end
 })
 
-local KillerESP = ESPBox:AddCheckbox("KillerESP", {
-    Text = "ESP Killer",
-    Default = false,
+ESPBox:Toggle({
+    Flag = "KillerESP",
+    Title = "ESP Killer",
+    Value = false,
+    Type = "Checkbox",
     Callback = function(v)
         ESP.Killer = v
     end
 })
 
-KillerESP:AddColorPicker("KillerESPColor", {
-    Default = TeamColors.Killer,
+ESPBox:Colorpicker({
+    Flag = "KillerESPColor",
     Title = "Killer Color",
-
+    Default = TeamColors.Killer,
     Callback = function(color)
         TeamColors.Killer = color
     end
 })
 
-local ESPGeneratorToggle =
-ESPBox:AddCheckbox("ESPGenerator", {
-    Text = "Generator",
-    Default = false,
+ESPBox:Toggle({
+    Flag = "ESPGenerator",
+    Title = "Generator",
+    Value = false,
+    Type = "Checkbox",
     Callback = function(v)
         ESP.Generator = v
     end
 })
 
-ESPGeneratorToggle:AddColorPicker("GeneratorColor", {
-    Default = GeneratorColor,
+ESPBox:Colorpicker({
+    Flag = "GeneratorColor",
     Title = "Generator Color",
+    Default = GeneratorColor,
     Callback = function(v)
         GeneratorColor = v
     end
 })
 
-local ESPSCPToggle =
-ESPBox:AddCheckbox("ESPSCP", {
-    Text = "SCP",
-    Default = false,
+ESPBox:Toggle({
+    Flag = "ESPSCP",
+    Title = "SCP",
+    Value = false,
+    Type = "Checkbox",
     Callback = function(v)
         ESP.SCP = v
     end
 })
 
-ESPSCPToggle:AddColorPicker("SCPColor", {
-    Default = SCPColor,
+ESPBox:Colorpicker({
+    Flag = "SCPColor",
     Title = "SCP Color",
+    Default = SCPColor,
     Callback = function(v)
         SCPColor = v
     end
 })
 
-local ESPPalletToggle =
-ESPBox:AddCheckbox("ESPPallet", {
-    Text = "Pallet",
-    Default = false,
+ESPBox:Toggle({
+    Flag = "ESPPallet",
+    Title = "Pallet",
+    Value = false,
+    Type = "Checkbox",
     Callback = function(v)
         ESP.Pallet = v
     end
 })
 
-ESPPalletToggle:AddColorPicker("PalletColor", {
-    Default = PalletColor,
+ESPBox:Colorpicker({
+    Flag = "PalletColor",
     Title = "Pallet Color",
+    Default = PalletColor,
     Callback = function(v)
         PalletColor = v
     end
 })
 
-local ESPWindowToggle =
-ESPBox:AddCheckbox("ESPWindow", {
-    Text = "Window",
-    Default = false,
+ESPBox:Toggle({
+    Flag = "ESPWindow",
+    Title = "Window",
+    Value = false,
+    Type = "Checkbox",
     Callback = function(v)
         ESP.Window = v
     end
 })
 
-ESPWindowToggle:AddColorPicker("WindowColor", {
-    Default = WindowColor,
+ESPBox:Colorpicker({
+    Flag = "WindowColor",
     Title = "Window Color",
+    Default = WindowColor,
     Callback = function(v)
         WindowColor = v
     end
 })
 
-ESPBox:AddSlider("ESPDistance", {
-    Text = "ESP Radius",
-    Default = 100,
-    Min = 10,
-    Max = 1000,
-    Rounding = 0,
-
+ESPBox:Slider({
+    Flag = "ESPDistance",
+    Title = "ESP Radius",
+    Value = { Min = 10, Max = 1000, Default = 100 },
+    Step = 1,
     Callback = function(v)
         ESP.Distance = v
     end
 })
 
-ESPStatusBox:AddCheckbox("EnableStatus", {
-Text = "Enable Status ESP",
-Default = false,
-Callback = function(v)
-ESPStatus.Enabled = v
-end
+ESPStatusBox:Toggle({
+    Flag = "EnableStatus",
+    Title = "Enable Status ESP",
+    Value = false,
+    Type = "Checkbox",
+    Callback = function(v)
+        ESPStatus.Enabled = v
+    end
 })
 
-ESPStatusBox:AddCheckbox("ShowName", {
-Text = "Show Name",
-Default = true,
-Callback = function(v)
-ESPStatus.ShowName = v
-end
+ESPStatusBox:Toggle({
+    Flag = "ShowName",
+    Title = "Show Name",
+    Value = true,
+    Type = "Checkbox",
+    Callback = function(v)
+        ESPStatus.ShowName = v
+    end
 })
 
-ESPStatusBox:AddCheckbox("ShowDistance", {
-Text = "Show Distance",
-Default = true,
-Callback = function(v)
-ESPStatus.ShowDistance = v
-end
+ESPStatusBox:Toggle({
+    Flag = "ShowDistance",
+    Title = "Show Distance",
+    Value = true,
+    Type = "Checkbox",
+    Callback = function(v)
+        ESPStatus.ShowDistance = v
+    end
 })
 
-ESPStatusBox:AddCheckbox("ShowHealth", {
-Text = "Show Health",
-Default = false,
-Callback = function(v)
-ESPStatus.ShowHealth = v
-end
+ESPStatusBox:Toggle({
+    Flag = "ShowHealth",
+    Title = "Show Health",
+    Value = false,
+    Type = "Checkbox",
+    Callback = function(v)
+        ESPStatus.ShowHealth = v
+    end
 })
 
-ESPStatusBox:AddSlider("StatusRadius", {
-Text = "Status Radius",
-Default = 100,
-Min = 20,
-Max = 500,
-Rounding = 0,
-Callback = function(v)
-ESPStatus.Radius = v
-end
+ESPStatusBox:Slider({
+    Flag = "StatusRadius",
+    Title = "Status Radius",
+    Value = { Min = 20, Max = 500, Default = 100 },
+    Step = 1,
+    Callback = function(v)
+        ESPStatus.Radius = v
+    end
 })
 
 
 
 -- ================= CROSSHAIR =================
-local CrosshairToggle = CrosshairBox:AddCheckbox("CrosshairEnabled", {
-    Text = "Enable Crosshair",
-    Default = false,
+CrosshairBox:Toggle({
+    Flag = "CrosshairEnabled",
+    Title = "Enable Crosshair",
+    Value = false,
     Callback = function(v)
         Crosshair.Enabled = v
     end
 })
 
-CrosshairToggle:AddColorPicker("CrosshairColor", {
-    Default = Color3.fromRGB(255,255,255),
+CrosshairBox:Colorpicker({
+    Flag = "CrosshairColor",
     Title = "Crosshair Color",
-    Transparency = 0,
+    Default = Color3.fromRGB(255,255,255),
     Callback = function(color)
         Crosshair.Color = color
     end
 })
 
-CrosshairBox:AddDropdown("Style", {
-Values = {"Plus","Dot","Circle"},
-Default = 1,
-Multi = false,
-Text = "Style",
-Callback = function(v) Crosshair.Style = v end
+CrosshairBox:Dropdown({
+    Flag = "Style",
+    Title = "Style",
+    Values = {"Plus","Dot","Circle"},
+    Value = 1,
+    Callback = function(v) Crosshair.Style = v end
 })
 
-CrosshairBox:AddSlider("CrosshairPosX", {
-    Text = "Position X",
-    Default = 0,
-    Min = -100,
-    Max = 100,
-    Rounding = 0,
-
+CrosshairBox:Slider({
+    Flag = "CrosshairPosX",
+    Title = "Position X",
+    Value = { Min = -100, Max = 100, Default = 0 },
+    Step = 1,
     Callback = function(v)
         Crosshair.OffsetX = v
     end
 })
 
-CrosshairBox:AddSlider("CrosshairPosY", {
-    Text = "Position Y",
-    Default = 0,
-    Min = -100,
-    Max = 100,
-    Rounding = 0,
-
+CrosshairBox:Slider({
+    Flag = "CrosshairPosY",
+    Title = "Position Y",
+    Value = { Min = -100, Max = 100, Default = 0 },
+    Step = 1,
     Callback = function(v)
         Crosshair.OffsetY = v
     end
@@ -3311,64 +3288,68 @@ CrosshairBox:AddSlider("CrosshairPosY", {
 
 -- =============== PLAYER =================
 
-AbilityTab:AddCheckbox("Skill", {
-    Text = "Auto Skill Check",
-    Default = false,
+AbilityTab:Toggle({
+    Flag = "Skill",
+    Title = "Auto Skill Check",
+    Value = false,
     Callback = function(v)
         Auto.SkillCheck = v
         if v then startSkillCheck() end
     end
 })
 
-AbilityTab:AddCheckbox("AutoWiggle", {
-    Text = "Auto Wiggle",
-    Default = false,
+AbilityTab:Toggle({
+    Flag = "AutoWiggle",
+    Title = "Auto Wiggle",
+    Value = false,
     Callback = function(v)
         Auto.Wiggle = v
     end
 })
 
-AbilityTab:AddCheckbox("AutoFleeKiller", {
-    Text = "Auto Flee Killer",
-    Default = false,
-
+AbilityTab:Toggle({
+    Flag = "AutoFleeKiller",
+    Title = "Auto Flee Killer",
+    Value = false,
     Callback = function(v)
         AutoFlee.Enabled = v
     end
 })
 
-AbilityTab:AddCheckbox("GodMode", {
-    Text = "Anti KnockDown",
-    Default = false,
+AbilityTab:Toggle({
+    Flag = "GodMode",
+    Title = "Anti KnockDown",
+    Value = false,
     Callback = function(v)
         PlayerMods.GodMode = v
     end
 })
 
-AbilityTab:AddCheckbox("FastVault", {
-    Text = "Fast Vault",
-    Default = false,
+AbilityTab:Toggle({
+    Flag = "FastVault",
+    Title = "Fast Vault",
+    Value = false,
     Callback = function(v)
         FastVault.Enabled = v
     end
 })
 
-AbilityTab:AddSlider("VaultSpeed", {
-    Text = "Animation Speed",
-    Default = 1.2,
-    Min = 1,
-    Max = 5,
-    Rounding = 1,
+AbilityTab:Slider({
+    Flag = "VaultSpeed",
+    Title = "Animation Speed",
+    Value = { Min = 1, Max = 5, Default = 1.2 },
+    Step = 0.1,
     Callback = function(v)
         FastVault.Speed = v
     end
 })
 
-AbilityTab:AddDivider()
+AbilityTab:Divider()
 
-AbilityTab:AddCheckbox("MoonwalkButton", {
-    Text = "MoonwalkButton",
-    Default = false,
+AbilityTab:Toggle({
+    Flag = "MoonwalkButton",
+    Title = "MoonwalkButton",
+    Value = false,
     Callback = function(v)
         Moonwalk.ShowButton = v
 
@@ -3380,21 +3361,19 @@ AbilityTab:AddCheckbox("MoonwalkButton", {
     end
 })
 
-AbilityTab:AddLabel("Moonwalk Keybind"):AddKeyPicker("MoonwalkKey", {
-    Default = "V", -- tombol default
-    Mode = "Toggle", -- bisa: Toggle / Hold
-    Text = "Moonwalk (pc)",
-    Callback = function(state)
-        -- state = true saat aktif (Toggle ON / Hold ditekan)
-        Moonwalk.Enabled = state
+AbilityTab:Keybind({
+    Flag = "MoonwalkKey",
+    Title = "Moonwalk Keybind",
+    Value = Enum.KeyCode.V,
+    Callback = function()
+        Moonwalk.Enabled = not Moonwalk.Enabled
 
         local char = LocalPlayer.Character
         local hum = char and char:FindFirstChildOfClass("Humanoid")
 
-        if state then
+        if Moonwalk.Enabled then
             startMoonwalk()
         else
-            -- balikin speed normal / speed boost
             if hum then
                 if PlayerMods.Speed then
                     hum.WalkSpeed = SpeedValue
@@ -3406,41 +3385,37 @@ AbilityTab:AddLabel("Moonwalk Keybind"):AddKeyPicker("MoonwalkKey", {
     end
 })
 
-AbilityTab:AddSlider("MoonwalkSpamSpeed", {
-    Text = "Spam Speed",
-    Default = Moonwalk.SpamSpeed,
-    Min = 1,
-    Max = 50,
-    Rounding = 0,
-
+AbilityTab:Slider({
+    Flag = "MoonwalkSpamSpeed",
+    Title = "Spam Speed",
+    Value = { Min = 1, Max = 50, Default = Moonwalk.SpamSpeed },
+    Step = 1,
     Callback = function(Value)
         Moonwalk.SpamSpeed = Value
     end
 })
 
-AbilityTab:AddSlider("MoonwalkIntensity", {
-    Text = "Intensity",
-    Default = Moonwalk.Intensity,
-    Min = 1,
-    Max = 50,
-    Rounding = 1,
-
+AbilityTab:Slider({
+    Flag = "MoonwalkIntensity",
+    Title = "Intensity",
+    Value = { Min = 1, Max = 50, Default = Moonwalk.Intensity },
+    Step = 0.1,
     Callback = function(Value)
         Moonwalk.Intensity = Value
     end
 })
 
-AbilityTab:AddButton({
-    Text = "instan escape",
-
-    Func = function()
+AbilityTab:Button({
+    Title = "instan escape",
+    Callback = function()
         teleportToFinishLine()
     end
 })
 
-KillerTab:AddCheckbox("AutoStalk", {
-    Text = "Auto Stalk",
-    Default = false,
+KillerTab:Toggle({
+    Flag = "AutoStalk",
+    Title = "Auto Stalk",
+    Value = false,
     Callback = function(v)
         AutoStalk.Enabled = v
         if v then
@@ -3451,9 +3426,10 @@ KillerTab:AddCheckbox("AutoStalk", {
     end
 })
 
-KillerTab:AddCheckbox("AttackAim", {
-    Text = "AimLock Attack",
-    Default = false,
+KillerTab:Toggle({
+    Flag = "AttackAim",
+    Title = "AimLock Attack",
+    Value = false,
     Callback = function(v)
         AttackAim.Enabled = v
 
@@ -3463,28 +3439,29 @@ KillerTab:AddCheckbox("AttackAim", {
     end
 })
 
-KillerTab:AddCheckbox("KillAll", {
-    Text = "Auto Kill All",
-    Default = false,
+KillerTab:Toggle({
+    Flag = "KillAll",
+    Title = "Auto Kill All",
+    Value = false,
     Callback = function(v)
         Killer.KillAll = v
     end
 })
 
-KillerTab:AddCheckbox("AutoAttack", {
-    Text = "Auto Spam Attack",
-    Default = false,
+KillerTab:Toggle({
+    Flag = "AutoAttack",
+    Title = "Auto Spam Attack",
+    Value = false,
     Callback = function(v)
         Killer.AutoAttack = v
     end
 })
 
-KillerTab:AddSlider("AttackDelay", {
-    Text = "Attack Delay",
-    Default = 0.45,
-    Min = 0.1,
-    Max = 1,
-    Rounding = 2,
+KillerTab:Slider({
+    Flag = "AttackDelay",
+    Title = "Attack Delay",
+    Value = { Min = 0.1, Max = 1, Default = 0.45 },
+    Step = 0.01,
     Callback = function(v)
         Killer.AttackDelay = v
     end
@@ -3492,55 +3469,61 @@ KillerTab:AddSlider("AttackDelay", {
 
 -- ================= MASKED POWER =================
 
-KillerTab:AddDivider()
-KillerTab:AddDropdown("MaskedPowerSelect", {
-    Text = "Select Power",
+KillerTab:Divider()
+KillerTab:Dropdown({
+    Flag = "MaskedPowerSelect",
+    Title = "Select Power",
     Values = MaskedPowers,
-    Default = 1,
-    Multi = false,
+    Value = 1,
     Callback = function(val)
         Masked.CurrentPower = val
     end
 })
 
-KillerTab:AddButton("Activate Power", function()
-    local Event = ReplicatedStorage:FindFirstChild("Remotes", true)
-        and ReplicatedStorage.Remotes:FindFirstChild("Killers", true)
-        and ReplicatedStorage.Remotes.Killers:FindFirstChild("Masked", true)
-        and ReplicatedStorage.Remotes.Killers.Masked:FindFirstChild("Activatepower")
-    
-    if Event then
-        Event:FireServer(Masked.CurrentPower)
-    else
+KillerTab:Button({
+    Title = "Activate Power",
+    Callback = function()
+        local Event = ReplicatedStorage:FindFirstChild("Remotes", true)
+            and ReplicatedStorage.Remotes:FindFirstChild("Killers", true)
+            and ReplicatedStorage.Remotes.Killers:FindFirstChild("Masked", true)
+            and ReplicatedStorage.Remotes.Killers.Masked:FindFirstChild("Activatepower")
+        
+        if Event then
+            Event:FireServer(Masked.CurrentPower)
+        else
+        end
     end
-end)
+})
 
-KillerTab:AddButton("Deactivate Power", function()
-    local Event = ReplicatedStorage:FindFirstChild("Remotes", true)
-        and ReplicatedStorage.Remotes:FindFirstChild("Killers", true)
-        and ReplicatedStorage.Remotes.Killers:FindFirstChild("Masked", true)
-        and ReplicatedStorage.Remotes.Killers.Masked:FindFirstChild("Deactivatepower")
-    
-    if Event then
-        Event:FireServer()
-    else
+KillerTab:Button({
+    Title = "Deactivate Power",
+    Callback = function()
+        local Event = ReplicatedStorage:FindFirstChild("Remotes", true)
+            and ReplicatedStorage.Remotes:FindFirstChild("Killers", true)
+            and ReplicatedStorage.Remotes.Killers:FindFirstChild("Masked", true)
+            and ReplicatedStorage.Remotes.Killers.Masked:FindFirstChild("Deactivatepower")
+        
+        if Event then
+            Event:FireServer()
+        else
+        end
     end
-end)
+})
 
-local AutoParryToggle = ParryBox:AddCheckbox("AutoParry", {
-    Text = "Auto Parry",
-    Default = false,
+ParryBox:Toggle({
+    Flag = "AutoParry",
+    Title = "Auto Parry",
+    Value = false,
     Callback = function(v)
         Auto.Parry = v
         ParryRangeVisual.Enabled = v
     end
 })
 
-AutoParryToggle:AddColorPicker("ParryRangeColor", {
-    Default = Color3.fromRGB(255, 80, 80),
-    Transparency = 0,
+ParryBox:Colorpicker({
+    Flag = "ParryRangeColor",
     Title = "Parry Range Color",
-
+    Default = Color3.fromRGB(255, 80, 80),
     Callback = function(color)
         ParryRangeVisual.Color = color
 
@@ -3550,9 +3533,10 @@ AutoParryToggle:AddColorPicker("ParryRangeColor", {
     end
 })
 
-ParryBox:AddCheckbox("ShowParryRange", {
-    Text = "Show Parry Range",
-    Default = true,
+ParryBox:Toggle({
+    Flag = "ShowParryRange",
+    Title = "Show Parry Range",
+    Value = true,
     Callback = function(Value)
         ParryRangeVisual.Enabled = Value
         
@@ -3563,84 +3547,77 @@ ParryBox:AddCheckbox("ShowParryRange", {
     end
 })
 
-ParryBox:AddSlider("ParryDistance", {
-    Text = "Distance",
-    Default = 15,
-    Min = 5,
-    Max = 20,
-    Rounding = 0,
+ParryBox:Slider({
+    Flag = "ParryDistance",
+    Title = "Distance",
+    Value = { Min = 5, Max = 20, Default = 15 },
+    Step = 1,
     Callback = function(v)
         Auto.ParryDistance = v
     end
 })
 
-ParryBox:AddSlider("FaceSensitivity", {
-    Text = "Face Sensitivity Killer",
-    Default = 0.7,
-    Min = -1,
-    Max = 1,
-    Rounding = 2,
+ParryBox:Slider({
+    Flag = "FaceSensitivity",
+    Title = "Face Sensitivity Killer",
+    Value = { Min = -1, Max = 1, Default = 0.7 },
+    Step = 0.01,
     Callback = function(v)
         Auto.FaceSensitivity = v
     end
 })
 
-AimlockBox:AddToggle("GunAimEnabled", {
-    Text = "Aim Lock",
-    Default = false,
-
+AimlockBox:Toggle({
+    Flag = "GunAimEnabled",
+    Title = "Aim Lock",
+    Value = false,
     Callback = function(v)
         GunAim.Enabled = v
     end
 })
 
-AimlockBox:AddDropdown("GunAimTarget", {
+AimlockBox:Dropdown({
+    Flag = "GunAimTarget",
+    Title = "Target",
     Values = {
         "Killer",
         "Survivor",
         "SCP"
     },
-
-    Default = 1,
-    Text = "Target",
-
+    Value = 1,
     Callback = function(v)
         GunAim.TargetMode = v
     end
 })
 
-AimlockBox:AddDropdown("GunAimPart", {
-    Text = "Aim Part",
+AimlockBox:Dropdown({
+    Flag = "GunAimPart",
+    Title = "Aim Part",
     Values = {
         "Head",
         "HumanoidRootPart",
         "Torso"
     },
-    Default = 2,
-
+    Value = 2,
     Callback = function(Value)
         GunAim.AimPart = Value
     end
 })
-AimlockBox:AddSlider("GunAimFOV", {
-    Text = "FOV",
-    Default = 250,
-    Min = 50,
-    Max = 1000,
-    Rounding = 0,
-
+AimlockBox:Slider({
+    Flag = "GunAimFOV",
+    Title = "FOV",
+    Value = { Min = 50, Max = 1000, Default = 250 },
+    Step = 1,
     Callback = function(v)
         GunAim.FOV = v
     end
 })
 
-AimlockBox:AddSlider("GunAimPredict", {
-    Text = "Prediction",
-    Default = 0.12,
-    Min = 0,
-    Max = 1,
-    Rounding = 2,
-
+AimlockBox:Slider({
+    Flag = "GunAimPredict",
+    Title = "Prediction",
+    Value = { Min = 0, Max = 1, Default = 0.12 },
+    Step = 0.01,
     Callback = function(v)
         GunAim.PredictStrength = v
     end
@@ -3648,10 +3625,10 @@ AimlockBox:AddSlider("GunAimPredict", {
 
 -- ================= MOVEMENT =================
 
-MovementBox:AddCheckbox("WalkSpeedToggle", {
-    Text = "Walk Speed",
-    Default = false,
-    Disabled = false,
+MovementBox:Toggle({
+    Flag = "WalkSpeedToggle",
+    Title = "Walk Speed",
+    Value = false,
     Callback = function(v)
         Movement.WalkSpeedEnabled = v
         if v then
@@ -3667,12 +3644,11 @@ MovementBox:AddCheckbox("WalkSpeedToggle", {
     end
 })
 
-MovementBox:AddSlider("WalkSpeedSlider", {
-    Text = "Walk Speed Value",
-    Default = 17.6,
-    Min = 16,
-    Max = 32,
-    Rounding = 1,
+MovementBox:Slider({
+    Flag = "WalkSpeedSlider",
+    Title = "Walk Speed Value",
+    Value = { Min = 16, Max = 32, Default = 17.6 },
+    Step = 0.1,
     Callback = function(v)
         Movement.WalkSpeedValue = v
         if Movement.WalkSpeedEnabled then
@@ -3681,17 +3657,19 @@ MovementBox:AddSlider("WalkSpeedSlider", {
     end
 })
 
-MovementBox:AddCheckbox("NoClipToggle", {
-    Text = "No Clip",
-    Default = false,
+MovementBox:Toggle({
+    Flag = "NoClipToggle",
+    Title = "No Clip",
+    Value = false,
     Callback = function(v)
         toggleNoClip(v)
     end
 })
 
-MovementBox:AddCheckbox("JumpPowerToggle", {
-    Text = "Custom Jump Power",
-    Default = false,
+MovementBox:Toggle({
+    Flag = "JumpPowerToggle",
+    Title = "Custom Jump Power",
+    Value = false,
     Callback = function(v)
         Movement.JumpPowerEnabled = v
         if v then
@@ -3707,12 +3685,11 @@ MovementBox:AddCheckbox("JumpPowerToggle", {
     end
 })
 
-MovementBox:AddSlider("JumpPowerSlider", {
-    Text = "Jump Power Value",
-    Default = 50,
-    Min = 0,
-    Max = 300,
-    Rounding = 0,
+MovementBox:Slider({
+    Flag = "JumpPowerSlider",
+    Title = "Jump Power Value",
+    Value = { Min = 0, Max = 300, Default = 50 },
+    Step = 1,
     Callback = function(v)
         Movement.JumpPowerValue = v
         if Movement.JumpPowerEnabled then
@@ -3721,11 +3698,11 @@ MovementBox:AddSlider("JumpPowerSlider", {
     end
 })
 
-EmoteBox:AddDropdown("SelectEmote", {
+EmoteBox:Dropdown({
+    Flag = "SelectEmote",
+    Title = "Select Emote",
     Values = EmoteList,
-    Default = 1,
-    Multi = false,
-    Text = "Select Emote",
+    Value = 1,
     Callback = function(v)
         Emote.Selected = v
         -- update label di GUI button
@@ -3735,17 +3712,17 @@ EmoteBox:AddDropdown("SelectEmote", {
     end
 })
 
-EmoteBox:AddButton({
-    Text = "Play Emote",
-
-    Func = function()
+EmoteBox:Button({
+    Title = "Play Emote",
+    Callback = function()
         playEmote(Emote.Selected)
     end
 })
 
-EmoteBox:AddToggle("ShowEmoteButton", {
-    Text = "Show Emote Button",
-    Default = false,
+EmoteBox:Toggle({
+    Flag = "ShowEmoteButton",
+    Title = "Show Emote Button",
+    Value = false,
     Callback = function(v)
         EmoteButton.Show = v
         if v then
@@ -3757,9 +3734,10 @@ EmoteBox:AddToggle("ShowEmoteButton", {
 })
 
 -- ======== FUN / TROLL =================
-FunBox:AddToggle("JerkTool", {
-    Text = "Jerk Tool",
-    Default = false,
+FunBox:Toggle({
+    Flag = "JerkTool",
+    Title = "Jerk Tool",
+    Value = false,
     Callback = function(v)
         JerkTool.Enabled = v
         if v then
@@ -3774,83 +3752,98 @@ FunBox:AddToggle("JerkTool", {
 })
 
 -- == AVATAR STEALER UI =================
-MorphAvaBox:AddInput("StealUsername", {
-    Text = "Target Username",
-    Default = "",
+MorphAvaBox:Input({
+    Flag = "StealUsername",
+    Title = "Target Username",
+    Value = "",
     Placeholder = "Ketik username target...",
     Callback = function(val)
         AvatarStealer.TargetUsername = val
     end
 })
-MorphAvaBox:AddButton("Copy Avatar", function()
-    copyAvatar(AvatarStealer.TargetUsername)
-end)
+MorphAvaBox:Button({
+    Title = "Copy Avatar",
+    Callback = function()
+        copyAvatar(AvatarStealer.TargetUsername)
+    end
+})
 
-MorphAvaBox:AddButton("Reset to Original Skin", function()
-    resetAvatar()
-end)
+MorphAvaBox:Button({
+    Title = "Reset to Original Skin",
+    Callback = function()
+        resetAvatar()
+    end
+})
 
-MorphAvaBox:AddButton("Save Current as Original", function()
-    saveOriginalAppearance()
-end)
+MorphAvaBox:Button({
+    Title = "Save Current as Original",
+    Callback = function()
+        saveOriginalAppearance()
+    end
+})
 -- ================= VISUAL =================
-VisualBox:AddCheckbox("Fullbright", {
-Text = "Fullbright",
-Default = false,
+VisualBox:Toggle({
+Flag = "Fullbright",
+Title = "Fullbright",
+Value = false,
 Callback = function(v) 
 Visual.Fullbright = v
 applyVisual()
 end
 })
 
-VisualBox:AddCheckbox("NoShadow", {
-Text = "No Shadow",
-Default = false,
+VisualBox:Toggle({
+Flag = "NoShadow",
+Title = "No Shadow",
+Value = false,
 Callback = function(v) Visual.NoShadow = v end
 })
 
-VisualBox:AddCheckbox("LowGraphics", {
-Text = "Low Graphics",
-Default = false,
+VisualBox:Toggle({
+Flag = "LowGraphics",
+Title = "Low Graphics",
+Value = false,
 Callback = function(v)
 Visual.LowGraphics = v 
 applyOptimization()
 end
 })
 
-VisualBox:AddCheckbox("NoScreenEffects", {
-    Text = "No Screen Effects",
-    Default = false,
+VisualBox:Toggle({
+    Flag = "NoScreenEffects",
+    Title = "No Screen Effects",
+    Value = false,
     Callback = function(v)
         Visual.NoScreenEffects = v
         applyNoScreenEffects()
     end
 })
 
-VisualBox:AddCheckbox("CleanSky", {
-Text = "Clean Sky",
-Default = false,
+VisualBox:Toggle({
+Flag = "CleanSky",
+Title = "Clean Sky",
+Value = false,
 Callback = function(v)
 Visual.CleanSky = v 
 applyOptimization()
 end
 })
 
-ZoomBox:AddToggle("UnlimitedZoom", {
-    Text = "Unlimited Zoom Out",
-    Default = false,
+ZoomBox:Toggle({
+    Flag = "UnlimitedZoom",
+    Title = "Unlimited Zoom Out",
+    Value = false,
     Callback = function(v)
         CameraZoom.UnlimitedZoom = v
         applyUnlimitedZoom()
     end
 })
 
-ZoomBox:AddSlider("MaxZoomDistance", {
-    Text = "Max Zoom Distance",
-    Default = 1000,
-    Min = 100,
-    Max = 5000,
-    Rounding = 0,
+ZoomBox:Slider({
+    Flag = "MaxZoomDistance",
+    Title = "Max Zoom Distance",
+    Value = { Min = 100, Max = 5000, Default = 1000 },
+    Step = 1,
     Callback = function(v)
         CameraZoom.MaxDistance = v
         if CameraZoom.UnlimitedZoom then
@@ -3859,23 +3852,21 @@ ZoomBox:AddSlider("MaxZoomDistance", {
     end
 })
 
-ZoomBox:AddToggle("CustomFOV", {
-    Text = "Custom FOV",
-    Default = false,
-
+ZoomBox:Toggle({
+    Flag = "CustomFOV",
+    Title = "Custom FOV",
+    Value = false,
     Callback = function(Value)
         CameraZoom.FOVEnabled = Value
         applyCameraFOV()
     end
 })
 
-ZoomBox:AddSlider("CameraFOV", {
-    Text = "Camera FOV",
-    Default = 70,
-    Min = 40,
-    Max = 120,
-    Rounding = 0,
-
+ZoomBox:Slider({
+    Flag = "CameraFOV",
+    Title = "Camera FOV",
+    Value = { Min = 40, Max = 120, Default = 70 },
+    Step = 1,
     Callback = function(Value)
         CameraZoom.FOV = Value
 
@@ -3887,12 +3878,11 @@ ZoomBox:AddSlider("CameraFOV", {
 
 
 -- ================= CLOCK TIME & AMBIENT =================
-TimeBox:AddSlider("ClockTime", {
-    Text = "Clock Time",
-    Default = 14,
-    Min = 0,
-    Max = 24,
-    Rounding = 0,
+TimeBox:Slider({
+    Flag = "ClockTime",
+    Title = "Clock Time",
+    Value = { Min = 0, Max = 24, Default = 14 },
+    Step = 1,
     Callback = function(v)
         Visual.ClockTime = v
         Visual.Ambient = true
@@ -3900,12 +3890,11 @@ TimeBox:AddSlider("ClockTime", {
     end
 })
 
-TimeBox:AddSlider("Brightness", {
-    Text = "Brightness",
-    Default = 2,
-    Min = 0,
-    Max = 5,
-    Rounding = 1,
+TimeBox:Slider({
+    Flag = "Brightness",
+    Title = "Brightness",
+    Value = { Min = 0, Max = 5, Default = 2 },
+    Step = 0.1,
     Callback = function(v)
         Visual.Brightness = v
         Visual.Ambient = true
@@ -3914,76 +3903,194 @@ TimeBox:AddSlider("Brightness", {
 })
 
 -- ============ UI SETTINGS ================
-SettingBox:AddToggle("ShowCustomCursor", {
-	Text = "Custom Cursor",
-	Default = true,
-	Callback = function(Value)
-		Library.ShowCustomCursor = Value
-	end,
+SettingBox:Dropdown({
+    Flag = "NotificationSide",
+    Values = { "Left", "Right" },
+    Value = "Right",
+    Title = "Notification Side",
+    Callback = function(Value)
+        WindUI:SetNotificationLower(Value == "Left")
+    end,
 })
 
-SettingBox:AddDropdown("NotificationSide", {
-	Values = { "Left", "Right" },
-	Default = "Right",
-	Text = "Notification Side",
-	Callback = function(Value)
-		Library:SetNotifySide(Value)
-	end,
+SettingBox:Dropdown({
+    Flag = "DPIDropdown",
+    Values = { "50%", "75%", "85%", "100%", "125%", "150%" },
+    Value = "85%",
+    Title = "DPI Scale",
+    Callback = function(Value)
+        Value = Value:gsub("%%", "")
+        local DPI = tonumber(Value)
+        if DPI then
+            Window:SetUIScale(DPI / 100)
+        end
+    end,
 })
 
-SettingBox:AddDropdown("DPIDropdown", {
-	Values = { "50%", "75%", "85%", "100%", "125%", "150%" },
-	Default = "85%%",
-	Text = "DPI Scale",
-	Callback = function(Value)
-		Value = Value:gsub("%%", "")
-		local DPI = tonumber(Value)
-		Library:SetDPIScale(DPI)
-	end,
-})
-
-SettingBox:AddSlider("UICornerSlider", {
-	Text = "Corner Radius",
-	Default = Library.CornerRadius,
-	Min = 0,
-	Max = 20,
-	Rounding = 0,
-	Callback = function(value)
-		Window:SetCornerRadius(value)
-	end
-})
-
-SettingBox:AddToggle("WatermarkToggle", {
-    Text = "Watermark",
-    Default = true,
-
+SettingBox:Toggle({
+    Flag = "WatermarkToggle",
+    Title = "Watermark",
+    Value = true,
     Callback = function(Value)
         Watermark.Visible = Value
     end
 })
 
-SettingBox:AddDivider()
+SettingBox:Divider()
 
-SettingBox:AddButton("Join Discord", function()
-    setclipboard("https://discord.gg/3kmTx8Aeew")
-    Library:Notify({
-        Title = "link discord telah di copy!!",
-        Duration = 6
-    })
-end)
+SettingBox:Button({
+    Title = "Join Discord",
+    Callback = function()
+        setclipboard("https://discord.gg/3kmTx8Aeew")
+        WindUI:Notify({
+            Title = "link discord telah di copy!!",
+            Duration = 6
+        })
+    end
+})
 
-SettingBox:AddButton("Unload script", function()
-	Library:Unload()
-end)
+SettingBox:Button({
+    Title = "Unload script",
+    Callback = function()
+        Window:Destroy()
+    end
+})
 
--- ====== CONFIG & THEME =================
-ThemeManager:SetLibrary(Library)
-SaveManager:SetLibrary(Library)
+-- ====== THEME =================
+local ThemeBox = Tabs.UISettings:Section({ Title = "Theme", Opened = true })
 
-SaveManager:IgnoreThemeSettings()
-SaveManager:SetIgnoreIndexes({})
+ThemeBox:Dropdown({
+    Flag = "ThemeDropdown",
+    Title = "Theme",
+    Values = (function()
+        local names = {}
+        for name in pairs(WindUI:GetThemes()) do
+            table.insert(names, name)
+        end
+        table.sort(names)
+        return names
+    end)(),
+    Value = WindUI:GetCurrentTheme(),
+    Callback = function(selected)
+        WindUI:SetTheme(selected)
+    end,
+})
 
-ThemeManager:SetFolder("zryx vd")
-SaveManager:SetFolder("zryx vd/configs")
+ThemeBox:Toggle({
+    Flag = "Acrylic",
+    Title = "Acrylic",
+    Value = WindUI.Window and WindUI.Window.Acrylic or false,
+    Callback = function()
+        local isOn = WindUI.Window and WindUI.Window.Acrylic
+        WindUI:ToggleAcrylic(not isOn)
+    end,
+})
 
-SaveManager:BuildConfigSection(Tabs.UISettings)
+ThemeBox:Toggle({
+    Flag = "Transparent",
+    Title = "Transparent",
+    Value = WindUI:GetTransparency(),
+    Callback = function(state)
+        Window:ToggleTransparency(state)
+    end,
+})
+
+ThemeBox:Keybind({
+    Flag = "ToggleUIKey",
+    Title = "Toggle UI Key",
+    Value = Enum.KeyCode.RightShift,
+    Callback = function(v)
+        local key = typeof(v) == "EnumItem" and v or Enum.KeyCode[v]
+        if key then
+            Window:SetToggleKey(key)
+        end
+    end,
+})
+
+-- ====== CONFIG =================
+local ConfigBox = Tabs.UISettings:Section({ Title = "Config", Opened = true })
+
+do
+    local ConfigManager = Window.ConfigManager
+    local ConfigName = "default"
+
+    if ConfigManager then
+        local AllConfigs = ConfigManager:AllConfigs()
+
+        local ConfigNameInput = ConfigBox:Input({
+            Flag = "ConfigName",
+            Title = "Config Name",
+            Value = ConfigName,
+            Callback = function(value)
+                ConfigName = value ~= "" and value or ConfigName
+            end,
+        })
+
+        local AllConfigsDropdown = ConfigBox:Dropdown({
+            Flag = "AllConfigs",
+            Title = "All Configs",
+            Values = AllConfigs,
+            Value = AllConfigs[1],
+            AllowNone = true,
+            Callback = function(value)
+                if value and value ~= "" then
+                    ConfigName = value
+                    ConfigNameInput:Set(value)
+                end
+            end,
+        })
+
+        ConfigBox:Button({
+            Title = "Save Config",
+            Callback = function()
+                Window.CurrentConfig = ConfigManager:Config(ConfigName)
+                if Window.CurrentConfig:Save() then
+                    WindUI:Notify({
+                        Title = "Config Saved",
+                        Content = ConfigName,
+                        Duration = 3,
+                    })
+                end
+                AllConfigsDropdown:Refresh(ConfigManager:AllConfigs())
+            end,
+        })
+
+        ConfigBox:Button({
+            Title = "Load Config",
+            Callback = function()
+                Window.CurrentConfig = ConfigManager:CreateConfig(ConfigName)
+                if Window.CurrentConfig:Load() then
+                    WindUI:Notify({
+                        Title = "Config Loaded",
+                        Content = ConfigName,
+                        Duration = 3,
+                    })
+                end
+            end,
+        })
+
+        ConfigBox:Button({
+            Title = "Delete Config",
+            Callback = function()
+                if not Window.CurrentConfig then
+                    Window.CurrentConfig = ConfigManager:CreateConfig(ConfigName)
+                end
+                local ok, err = Window.CurrentConfig:Delete()
+                if ok then
+                    WindUI:Notify({
+                        Title = "Config Deleted",
+                        Content = ConfigName,
+                        Duration = 3,
+                    })
+                else
+                    WindUI:Notify({
+                        Title = "Failed to delete config",
+                        Content = tostring(err),
+                        Duration = 3,
+                    })
+                end
+                AllConfigsDropdown:Refresh(ConfigManager:AllConfigs())
+            end,
+        })
+    end
+end

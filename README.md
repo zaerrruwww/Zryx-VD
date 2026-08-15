@@ -60,7 +60,7 @@ Advanced Lua script for **Roblox Violence District** featuring Aimbot, Aimlock, 
    - Paste the script into your executor and run it.
 
 4. **Configure the GUI**  
-   - Open the menu with **Left Control** (or the toggle button on screen).  
+   - Open the menu with **Right Shift** (or the toggle button on screen).  
    - Enable Aimbot, ESP or whatever you need from the tabs.  
    - All settings are saved automatically per account.
 
@@ -88,7 +88,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/zaerrruwww/zryx-vd/ma
 | **No Clip** | Walk through walls. |
 | **Moonwalk** | Custom keybind movement spam. |
 | **WalkSpeed / JumpPower** | Movement speed and jump overrides. |
-| **Menu Keybind** | Custom key to open/close the UI (default: `Left Control`). |
+| **Menu Keybind** | Custom key to open/close the UI (default: `Right Shift`). |
 | **Theme & Save** | UI appearance tweaks with persistent config. |
 
 ---
@@ -97,7 +97,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/zaerrruwww/zryx-vd/ma
 
 | Action | Key |
 |--------|-----|
-| **Open/Close GUI** | `Left Control` |
+| **Open/Close GUI** | `Right Shift` |
 | **Aimbot / Aimlock** | Hold `Right Click` |
 | **Moonwalk** | *Via UI toggle* |
 
@@ -107,10 +107,10 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/zaerrruwww/zryx-vd/ma
 
 ## 📦 File Structure
 
-- `zryxvd.lua` – Main script, loads the Obsidian UI library and runs all features.  
+- `zryxvd.lua` – Main script, loads the WindUI library and runs all features.  
 - *External dependencies*:  
-  - [Obsidian UI Library](https://github.com/deividcomsono/Obsidian) (loaded remotely)  
-  - `ThemeManager` and `SaveManager` addons for UI theming and config persistence.
+  - [WindUI Library](https://github.com/Footagesus/WindUI) (loaded remotely)  
+  - Built-in config system for UI theming and config persistence.
 
 ---
 
@@ -124,7 +124,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/zaerrruwww/zryx-vd/ma
 
 ## 🙏 Credits
 
-- **Obsidian UI** – by [deividcomsono](https://github.com/deividcomsono)
+- **WindUI** – by [Footagesus](https://github.com/Footagesus)
 
 ---
 
