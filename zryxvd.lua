@@ -129,23 +129,23 @@ end)
 
 -- TABS
 local Tabs = {}
-Tabs.Info = Window:Tab({ Title = "Info", Icon = "info" })
-Tabs.ESP = Window:Tab({ Title = "ESP", Icon = "eye" })
+Tabs.Info = Window:Tab({ Title = "Info" })
+Tabs.ESP = Window:Tab({ Title = "ESP" })
 
 local PlayerSection = Window:Section({ Title = "Player", Opened = true })
-Tabs.Survivor = PlayerSection:Tab({ Title = "Survivor", Icon = "user" })
-Tabs.Killer = PlayerSection:Tab({ Title = "Killer", Icon = "skull" })
-Tabs.AimBot = PlayerSection:Tab({ Title = "AimBot", Icon = "crosshair" })
-Tabs.Parry = PlayerSection:Tab({ Title = "Parry", Icon = "swords" })
-Tabs.Crosshair = PlayerSection:Tab({ Title = "Crosshair", Icon = "crosshair" })
+Tabs.Survivor = PlayerSection:Tab({ Title = "Survivor" })
+Tabs.Killer = PlayerSection:Tab({ Title = "Killer" })
+Tabs.AimBot = PlayerSection:Tab({ Title = "AimBot" })
+Tabs.Parry = PlayerSection:Tab({ Title = "Parry" })
+Tabs.Crosshair = PlayerSection:Tab({ Title = "Crosshair" })
 
 local MiscSection = Window:Section({ Title = "Misc", Opened = true })
-Tabs.Movement = MiscSection:Tab({ Title = "Movement", Icon = "move" })
-Tabs.Emote = MiscSection:Tab({ Title = "Emote", Icon = "music" })
-Tabs.Fun = MiscSection:Tab({ Title = "Fun", Icon = "smile" })
+Tabs.Movement = MiscSection:Tab({ Title = "Movement" })
+Tabs.Emote = MiscSection:Tab({ Title = "Emote" })
+Tabs.Fun = MiscSection:Tab({ Title = "Fun" })
 
-Tabs.Visual = Window:Tab({ Title = "Visual", Icon = "sparkles" })
-Tabs.UISettings = Window:Tab({ Title = "UI Settings", Icon = "settings" })
+Tabs.Visual = Window:Tab({ Title = "Visual" })
+Tabs.UISettings = Window:Tab({ Title = "UI Settings" })
 
 -- SECTIONS (in-tab collapsible boxes)
 local InfoBox = Tabs.Info:Section({ Title = "Script Info", Opened = true })
@@ -3065,7 +3065,6 @@ ESPBox:Toggle({
     Flag = "SurvivorESP",
     Title = "ESP Survivor",
     Value = false,
-    Type = "Checkbox",
     Callback = function(v)
         ESP.Survivor = v
     end
@@ -3084,7 +3083,6 @@ ESPBox:Toggle({
     Flag = "KillerESP",
     Title = "ESP Killer",
     Value = false,
-    Type = "Checkbox",
     Callback = function(v)
         ESP.Killer = v
     end
@@ -3103,7 +3101,6 @@ ESPBox:Toggle({
     Flag = "ESPGenerator",
     Title = "Generator",
     Value = false,
-    Type = "Checkbox",
     Callback = function(v)
         ESP.Generator = v
     end
@@ -3122,7 +3119,6 @@ ESPBox:Toggle({
     Flag = "ESPSCP",
     Title = "SCP",
     Value = false,
-    Type = "Checkbox",
     Callback = function(v)
         ESP.SCP = v
     end
@@ -3141,7 +3137,6 @@ ESPBox:Toggle({
     Flag = "ESPPallet",
     Title = "Pallet",
     Value = false,
-    Type = "Checkbox",
     Callback = function(v)
         ESP.Pallet = v
     end
@@ -3160,7 +3155,6 @@ ESPBox:Toggle({
     Flag = "ESPWindow",
     Title = "Window",
     Value = false,
-    Type = "Checkbox",
     Callback = function(v)
         ESP.Window = v
     end
@@ -3189,7 +3183,6 @@ ESPStatusBox:Toggle({
     Flag = "EnableStatus",
     Title = "Enable Status ESP",
     Value = false,
-    Type = "Checkbox",
     Callback = function(v)
         ESPStatus.Enabled = v
     end
@@ -3199,7 +3192,6 @@ ESPStatusBox:Toggle({
     Flag = "ShowName",
     Title = "Show Name",
     Value = true,
-    Type = "Checkbox",
     Callback = function(v)
         ESPStatus.ShowName = v
     end
@@ -3209,7 +3201,6 @@ ESPStatusBox:Toggle({
     Flag = "ShowDistance",
     Title = "Show Distance",
     Value = true,
-    Type = "Checkbox",
     Callback = function(v)
         ESPStatus.ShowDistance = v
     end
@@ -3219,7 +3210,6 @@ ESPStatusBox:Toggle({
     Flag = "ShowHealth",
     Title = "Show Health",
     Value = false,
-    Type = "Checkbox",
     Callback = function(v)
         ESPStatus.ShowHealth = v
     end
