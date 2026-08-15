@@ -4,13 +4,46 @@ local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footag
 WindUI:AddTheme({
     Name = "Dark",
 
-    Accent = Color3.fromHex("#18181b"),
-    Background = Color3.fromHex("#101010"),
+    Accent = Color3.fromHex("#0091FF"),
+    Dialog = Color3.fromHex("#1a1a1a"),
     Outline = Color3.fromHex("#FFFFFF"),
     Text = Color3.fromHex("#FFFFFF"),
-    Placeholder = Color3.fromHex("#7a7a7a"),
+    Placeholder = Color3.fromHex("#a1a1a1"),
+    Background = Color3.fromHex("#101010"),
     Button = Color3.fromHex("#52525b"),
     Icon = Color3.fromHex("#a1a1aa"),
+    Toggle = Color3.fromHex("#33C759"),
+    Slider = Color3.fromHex("#0091FF"),
+    Checkbox = Color3.fromHex("#0091FF"),
+
+    PanelBackground = Color3.fromHex("#FFFFFF"),
+    PanelBackgroundTransparency = 0.95,
+
+    SliderIcon = Color3.fromHex("#908F95"),
+    Primary = Color3.fromHex("#0091FF"),
+
+    LabelBackground = Color3.fromHex("#000000"),
+    LabelBackgroundTransparency = 0.83,
+
+    ElementBackground = Color3.fromHex("#2A2A2C"),
+    ElementBackgroundTransparency = 0,
+
+    TabBackground = Color3.fromHex("#101010"),
+    TabBackgroundHover = Color3.fromHex("#26262A"),
+    TabBackgroundHoverTransparency = 0,
+    TabBackgroundActive = Color3.fromHex("#26262A"),
+    TabBackgroundActiveTransparency = 0,
+    TabText = Color3.fromHex("#FFFFFF"),
+    TabTextTransparency = 0,
+    TabTextTransparencyActive = 0,
+    TabTitle = Color3.fromHex("#FFFFFF"),
+    TabIcon = Color3.fromHex("#a1a1aa"),
+    TabIconTransparency = 0,
+    TabIconTransparencyActive = 0,
+    TabBorderTransparency = 1,
+
+    DropdownTabBackground = Color3.fromHex("#232327"),
+    DropdownBackground = Color3.fromHex("#1B1B1F"),
 })
 -- =======================================
 -- WINDOW
