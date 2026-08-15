@@ -3,7 +3,7 @@
   <img src="https://static.wikia.nocookie.net/roblox/images/7/78/VDIcon.webp/revision/latest?cb=20260713154719" width="240">
 </a>
 
-# ZRYX VD — Aimbot & Utility
+# zryx — Aimbot & Utility
 
 Advanced Lua script for **Roblox Violence District** featuring Aimbot, Aimlock, ESP, auto-parry, movement hacks, and a fully customizable UI.
 

@@ -47,16 +47,26 @@ WindUI:AddTheme({
 })
 -- =======================================
 -- WINDOW
+local UserInputService = game:GetService("UserInputService")
+local IsMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+
+local ok, err = pcall(function()
+    WindUI.Creator:AddIcons("zryx", { Logo = "rbxassetid://126755028963880" })
+end)
+if not ok then
+    warn("[zryx] failed to register logo icon: " .. tostring(err))
+end
+
 local Window = WindUI:CreateWindow({
-    Title   = "ZRYX VD",
+    Title   = "zryx",
     Author  = "Violence District - Freemium",
-    Folder  = "zryxvd",
+    Folder  = "zryx",
     Icon    = "zap",
     Theme   = "Dark",
     Acrylic = true,
     Transparent = true,
     Background = "rbxassetid://84152360484913",
-    Size    = UDim2.fromOffset(680, 460),
+    Size    = IsMobile and UDim2.fromOffset(600, 440) or UDim2.fromOffset(680, 460),
     MinSize = Vector2.new(560, 350),
     MaxSize = Vector2.new(850, 560),
     ToggleKey  = Enum.KeyCode.RightShift,
@@ -72,14 +82,14 @@ local Window = WindUI:CreateWindow({
         ButtonsType = "Default",
     },
     OpenButton = {
-        Title = "ZRYX VD",
-        Icon = "zap",
+        Title = "zryx",
+        Icon = "zryx:Logo",
         CornerRadius = UDim.new(1, 0),
         StrokeThickness = 3,
         Enabled = true,
         Draggable = true,
         OnlyMobile = false,
-        Scale = 1,
+        Scale = IsMobile and 1.35 or 1,
         Color = ColorSequence.new(
             Color3.fromHex("#000000"),
             Color3.fromHex("#000000")
@@ -98,9 +108,11 @@ local Stats = game:GetService("Stats")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
+Window:SetUIScale(IsMobile and 1 or 0.85)
+
 -- Custom watermark (WindUI has no draggable label)
 local WatermarkGui = Instance.new("ScreenGui")
-WatermarkGui.Name = "ZryxVdWatermark"
+WatermarkGui.Name = "ZryxWatermark"
 WatermarkGui.ResetOnSpawn = false
 WatermarkGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 WatermarkGui.Parent = game:GetService("CoreGui")
@@ -110,7 +122,7 @@ WatermarkLabel.Size = UDim2.fromOffset(240, 26)
 WatermarkLabel.Position = UDim2.new(0.5, -120, 0, 12)
 WatermarkLabel.BackgroundColor3 = Color3.fromRGB(16, 16, 20)
 WatermarkLabel.BackgroundTransparency = 0.2
-WatermarkLabel.Text = "ZRYX VD"
+WatermarkLabel.Text = "zryx"
 WatermarkLabel.TextColor3 = Color3.fromRGB(200, 215, 255)
 WatermarkLabel.TextSize = 14
 WatermarkLabel.Font = Enum.Font.GothamBold
@@ -152,7 +164,7 @@ RunService.RenderStepped:Connect(function()
 
         Watermark:SetText(
             string.format(
-                "ZRYX VD | FPS: %d | PING: %d ms",
+                "zryx | FPS: %d | PING: %d ms",
                 FPS,
                 Ping
             )
@@ -3057,41 +3069,16 @@ end
 
 -- ================= UI ================
 -- INFO
-InfoBox:Paragraph({ Title = "Script: Freemium" })
+InfoBox:Paragraph({ Title = "Script: zryx" })
 InfoBox:Paragraph({ Title = "Version: 2.0.0" })
 InfoBox:Paragraph({ Title = "Game: Violence District" })
-InfoBox:Paragraph({ Title = "Dev: â€¢à¼¶amillà¼¶â€¢" })
-InfoBox:Paragraph({ Title = "Join discord for more info" })
-InfoBox:Paragraph({ Title = "Discord:" })
-InfoBox:Button({
-    Title = "Copy Discord Link",
-    Callback = function()
-        setclipboard("https://discord.gg/52KS4yCD2")
-        WindUI:Notify({
-            Title = "Discord link copied!",
-            Duration = 3
-        })
-    end
-})
 
 -- CREDITS
 CreditsBox:Paragraph({ Title = "Developer:" })
-CreditsBox:Paragraph({ Title = "- zryx vd" })
+CreditsBox:Paragraph({ Title = "- zryx" })
 CreditsBox:Divider()
 CreditsBox:Paragraph({ Title = "Library:" })
 CreditsBox:Paragraph({ Title = "- WindUI" })
-CreditsBox:Divider()
-CreditsBox:Paragraph({ Title = "Support the dev:" })
-CreditsBox:Button({
-    Title = "Copy Support Link",
-    Callback = function()
-        setclipboard("https://sociabuzz.com/amill_al/tribe")
-        WindUI:Notify({
-            Title = "Thanks for the support!",
-            Duration = 3
-        })
-    end
-})
 
 -- ================= ESP =================
 ESPBox:Toggle({
@@ -3939,7 +3926,7 @@ SettingBox:Dropdown({
 SettingBox:Dropdown({
     Flag = "DPIDropdown",
     Values = { "50%", "75%", "85%", "100%", "125%", "150%" },
-    Value = "85%",
+    Value = IsMobile and "100%" or "85%",
     Title = "DPI Scale",
     Callback = function(Value)
         Value = Value:gsub("%%", "")
@@ -3960,17 +3947,6 @@ SettingBox:Toggle({
 })
 
 SettingBox:Divider()
-
-SettingBox:Button({
-    Title = "Join Discord",
-    Callback = function()
-        setclipboard("https://discord.gg/3kmTx8Aeew")
-        WindUI:Notify({
-            Title = "link discord telah di copy!!",
-            Duration = 6
-        })
-    end
-})
 
 SettingBox:Button({
     Title = "Unload script",
