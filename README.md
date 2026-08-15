@@ -1,177 +1,142 @@
 <div align="center">
+<a href="https://www.roblox.com/games/93978595733734/Violence-District">
+  <img src="https://static.wikia.nocookie.net/roblox/images/7/78/VDIcon.webp/revision/latest?cb=20260713154719" width="240">
+</a>
 
-<img src="https://static.wikia.nocookie.net/roblox/images/7/78/VDIcon.webp/revision/latest?cb=20260713154719" alt="Violence District" width="160" height="160" />
+# ZRYX VD — Aimbot & Utility
 
-</div>
+Advanced Lua script for **Roblox Violence District** featuring Aimbot, Aimlock, ESP, auto-parry, movement hacks, and a fully customizable UI.
 
-# 🟣 ZRYX VD
-
-### 🎯 Script All-in-One untuk Violence District
-
-Script paling lengkap untuk mendominasi *Violence District* — ESP, Aimbot, Auto-Play, Movement Hack, dan masih banyak lagi, semua dalam satu UI modern dan ringan.
-
-<br>
-
-![Version](https://img.shields.io/badge/Version-1.0.0-8b5cf6?style=for-the-badge&logo=github&logoColor=white)
-![Keyless](https://img.shields.io/badge/Keyless-100%25-22c55e?style=for-the-badge)
-![Executors](https://img.shields.io/badge/Executors-Xeno%20%7C%20Delta%20%7C%20Solara%20%7C%20Velocity-3b82f6?style=for-the-badge)
+![Lua](https://img.shields.io/badge/Language-Lua-2C2D72?style=for-the-badge&logo=lua)
+![Roblox](https://img.shields.io/badge/Platform-Roblox-E2231A?style=for-the-badge&logo=roblox)
+![Status](https://img.shields.io/badge/Status-Active-22C55E?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-v1.0-blue?style=for-the-badge)
+![Executors](https://img.shields.io/badge/Executors-Keyless-6B21A8?style=for-the-badge)
 
 </div>
 
 ---
 
-## 📖 Daftar Isi
+## ✨ Features
 
-- [✨ Fitur](#-fitur)
-- [🎮 Fitur Combat](#️-combat)
-- [👁 ESP](#-esp)
-- [🛡 Fitur Survivor](#-survivor-utilities)
-- [🏃 Movement](#-movement)
-- [🎨 Visual & Extra](#-visual--extra)
-- [🚀 Cara Pakai](#-cara-pakai)
-- [🎯 Keybinds](#-keybinds)
-- [💾 Save System](#-save-system)
-- [📌 Catatan](#-catatan)
-- [⚖️ Lisensi](#️-lisensi)
+- **Combat**  
+  - Aimbot & Aimlock with adjustable strength and prediction  
+  - Selectable aim part (Head / HumanoidRootPart) and custom FOV  
+  - Auto-parry that reacts to killer attack animations in real time  
+  - Kill All mode for killers with auto attack and auto carry  
 
----
+- **ESP System**  
+  - Highlights Survivors, Killers, Generators, Pallets, Windows and SCPs  
+  - Generator repair percentage shown directly above the machine  
+  - Optional status ESP displaying name, distance and health  
+  - Configurable radius for every ESP type  
 
-## ✨ Fitur
+- **Survivor Utilities**  
+  - God Mode, Auto Skill Check, Auto Wiggle and Auto Flee  
+  - Fast vault and animation speed boost  
+  - Morph avatar support  
 
-| Kategori | Status |
-|----------|--------|
-| Aimbot & Aimlock | ✅ Tersedia |
-| ESP Lengkap | ✅ Tersedia |
-| Autoparry | ✅ Tersedia |
-| Auto Skill Check | ✅ Tersedia |
-| Auto Wiggle | ✅ Tersedia |
-| Auto Flee Killer | ✅ Tersedia |
-| God Mode | ✅ Tersedia |
-| No Clip | ✅ Tersedia |
-| Moonwalk | ✅ Tersedia |
-| Custom UI Theme | ✅ Tersedia |
-| Save Config | ✅ Tersedia |
+- **Movement**  
+  - WalkSpeed and JumpPower overrides with smart disabling during animations  
+  - No Clip toggle  
+  - Moonwalk with custom keybind, spam speed and intensity  
+
+- **Visuals & QoL**  
+  - Ambient/clock controls, camera zoom and FOV  
+  - Emote player  
+  - Custom theme with save/load system  
 
 ---
 
-## ⚔️ Combat
+## 🛠️ Installation & Usage
 
-| Fitur | Deskripsi |
-|-------|-----------|
-| 🎯 **Aimbot** | Auto-aim ke musuh dengan strength yang bisa diatur |
-| 🔒 **Aimlock** | Kunci target selama tombol kanan ditekan |
-| 🧩 **Aim Part** | Pilih bagian tubuh target (Head / HumanoidRootPart) |
-| 👓 **FOV** | Atur field of view untuk aim |
-| 🔮 **Prediction** | Prediksi gerakan target agar tembakan selalu kena |
-| 💀 **Killer** | Kill All, Auto Attack, Auto Carry |
-| 🛡 **Autoparry** | Parry otomatis sempurna saat killer menyerang |
-| 📏 **Parry Range** | Atur jarak & cooldown parry |
-| 🔍 **Face Detection** | Deteksi arah hadap killer sebelum parry |
+1. **Get the script**  
+   - Copy the raw content of `zryxvd.lua` from this repository.
 
----
+2. **Inject with a Roblox executor**  
+   - Use any modern keyless executor (Xeno, Delta, Solara, Velocity, etc.).
 
-## 👁 ESP
+3. **Paste and execute**  
+   - Paste the script into your executor and run it.
 
-| Fitur | Deskripsi |
-|-------|-----------|
-| 🟢 Survivor ESP | Highlight semua survivor |
-| 🔴 Killer ESP | Highlight killer |
-| 🟡 Generator ESP | Menampilkan progress repair (%) |
-| 🟩 Pallet & Window ESP | Tandai pallet & window terdekat |
-| ⛔ SCP ESP | Deteksi SCP otomatis |
-| 📐 ESP Radius | Batas jarak tampil ESP |
-| 🏷 ESP Status | Nama, jarak, dan HP pemain |
+4. **Configure the GUI**  
+   - Open the menu with **Left Control** (or the toggle button on screen).  
+   - Enable Aimbot, ESP or whatever you need from the tabs.  
+   - All settings are saved automatically per account.
+
+5. **Let it run**  
+   - The script handles the rest — aim, parry, ESP and movement.
 
 ---
 
-## 🛡 Survivor Utilities
+### 📥 One-Liner Execution
+Copy and paste this line into your executor and run it:
 
-| Fitur | Deskripsi |
-|-------|-----------|
-| ⚡ **Auto Skill Check** | Generator skill check selalu perfect |
-| 🔓 **Auto Wiggle** | Lepas dari gendongan killer otomatis |
-| 🏃 **Auto Flee Killer** | Otomatis menjaga jarak dari killer |
-| 🚪 **Fast Vault** | Vault lebih cepat |
-| 💫 **Animation Speed** | Percepat animasi karakter |
-| 🧿 **God Mode** | Tidak bisa mati / down |
-| 👗 **Morph Avatar** | Ganti penampilan karakter |
+```lua
+loadstring(game:HttpGet("https://raw.githubusercontent.com/zaerrruwww/zryx-vd/main/zryxvd.lua"))()
+```
 
----
+## ⚙️ Configuration Options
 
-## 🏃 Movement
-
-| Fitur | Deskripsi |
-|-------|-----------|
-| ⚡ **Walk Speed** | Atur kecepatan jalan |
-| 🦘 **Jump Power** | Atur kekuatan lompat |
-| 🚫 **No Clip** | Tembus tembok |
-| 🌙 **Moonwalk** | Keybind custom dengan spam speed & intensity |
-| 🎯 **Crosshair** | Atur posisi & ukuran crosshair |
+| Option | Description |
+|--------|-------------|
+| **Aimbot / Aimlock** | Auto-aim at enemies while holding right click. |
+| **ESP** | Highlight players, generators, pallets, windows and SCPs. |
+| **Auto Parry** | Perfect parry against killer attacks automatically. |
+| **Auto Skill Check** | Hits perfect skill checks on generators. |
+| **God Mode** | Prevents death/down state. |
+| **No Clip** | Walk through walls. |
+| **Moonwalk** | Custom keybind movement spam. |
+| **WalkSpeed / JumpPower** | Movement speed and jump overrides. |
+| **Menu Keybind** | Custom key to open/close the UI (default: `Left Control`). |
+| **Theme & Save** | UI appearance tweaks with persistent config. |
 
 ---
 
-## 🎨 Visual & Extra
+## ⌨️ Default Keybinds
 
-| Fitur | Deskripsi |
-|-------|-----------|
-| ☀️ **Graphics** | Atur ambient, clock, dan lighting |
-| 🔭 **Zoom Out** | Zoom kamera lebih jauh |
-| 📺 **Camera FOV** | Ubah field of view kamera |
-| 💃 **Emote Player** | Putar emote kapan saja |
-| 🎨 **Custom Theme** | Ubah warna UI sesuai selera |
+| Action | Key |
+|--------|-----|
+| **Open/Close GUI** | `Left Control` |
+| **Aimbot / Aimlock** | Hold `Right Click` |
+| **Moonwalk** | *Via UI toggle* |
 
----
-
-## 🚀 Cara Pakai
-
-### 📥 Persiapan
-1. Unduh executor yang didukung (Xeno, Delta, Solara, Velocity) — **keyless**
-2. Buka game **Violence District**
-3. Tempel script dari `zryxvd.lua` ke executor
-4. Execute!
-
-### 🖥 Toggle Menu
-- Tekan **Left Control** untuk membuka/menutup menu
-- Klik tombol logo di pojok kiri layar untuk toggle cepat
-- Seret tombol logo untuk memindahkan posisinya
+> *All other options are controlled through the graphical interface.*
 
 ---
 
-## 🎯 Keybinds
+## 📦 File Structure
 
-| Aksi | Tombol |
-|------|--------|
-| Toggle Menu | `Left Control` |
-| Aimbot / Aimlock | Tahan `Right Click` |
-| Moonwalk | Keybind custom (atur di tab Misc) |
-
----
-
-## 💾 Save System
-
-- Semua pengaturan tersimpan **otomatis** per-akun
-- Config disimpan dengan nama `zryx vd`
-- Bisa save / load / reset kapan saja di tab **UI Settings**
+- `zryxvd.lua` – Main script, loads the Obsidian UI library and runs all features.  
+- *External dependencies*:  
+  - [Obsidian UI Library](https://github.com/deividcomsono/Obsidian) (loaded remotely)  
+  - `ThemeManager` and `SaveManager` addons for UI theming and config persistence.
 
 ---
 
-## 📌 Catatan
+## ⚠️ Disclaimer
 
-- ✅ Script terus diperbarui untuk versi terbaru *Violence District*
-- ⚡ Ringan dan tidak bikin FPS drop
-- 🧩 UI Library: **Obsidian UI**
-- 📱 Support mobile (touch) & PC
-
----
-
-## ⚖️ Lisensi
-
-Untuk penggunaan pribadi. Dilarang menjual ulang atau mengklaim ulang script ini tanpa izin.
+> **This script is intended for educational purposes only.**  
+> Using automation tools in Roblox violates Roblox's Terms of Service.  
+> **Use at your own risk.** The developers are not responsible for any account bans, warnings, or data loss.
 
 ---
 
-<div align="center">
+## 🙏 Credits
 
-**ZRYX VD** — Make them fear the name. 😈
+- **Obsidian UI** – by [deividcomsono](https://github.com/deividcomsono)
 
-</div>
+---
+
+## 📝 Changelog
+
+- **v1.0.0** – Initial release  
+  - Aimbot, Aimlock & FOV with prediction  
+  - Full ESP system with status & radius  
+  - Auto-parry, auto skill check, auto wiggle, auto flee  
+  - God Mode, No Clip, Moonwalk, walk speed & jump power  
+  - Custom theme with save/load
+
+---
+
+*Happy gaming… but remember – play fair!* 😉
