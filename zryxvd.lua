@@ -2370,14 +2370,13 @@ RunService.RenderStepped:Connect(function()
                     -- REVERSE MOONWALK: badan menghadap lawan arah gerak
                     -- maju (W) -> badan menghadap mundur, tetap meluncur ke depan
                     -- mundur (S) -> badan menghadap depan, tetap meluncur ke belakang
-                    -- Gerak pakai relatif kamera supaya selalu meluncur mulus
-                    local moveCamera = nil
+                    local moveDir = nil
                     local targetFace = flatLook
                     if UserInputService:IsKeyDown(Enum.KeyCode.W) then
-                        moveCamera = Vector3.new(0, 0, 1)
+                        moveDir = flatLook
                         targetFace = -flatLook
                     elseif UserInputService:IsKeyDown(Enum.KeyCode.S) then
-                        moveCamera = Vector3.new(0, 0, -1)
+                        moveDir = -flatLook
                         targetFace = flatLook
                     end
 
@@ -2388,12 +2387,13 @@ RunService.RenderStepped:Connect(function()
 
                     local baseCF = CFrame.new(hrp.Position) * CFrame.Angles(0, MoonwalkSmoothYaw, 0)
 
-                    if moveCamera then
+                    if moveDir then
                         local angle = math.sin(tick() * Moonwalk.SpamSpeed) * Moonwalk.Intensity
                         hrp.CFrame = baseCF * CFrame.Angles(0, math.rad(angle), 0)
-                        humanoid:Move(moveCamera, true)
+                        hrp.AssemblyLinearVelocity = moveDir * Moonwalk.SlowSpeed
                     else
                         hrp.CFrame = baseCF
+                        hrp.AssemblyLinearVelocity = Vector3.new(0, hrp.AssemblyLinearVelocity.Y, 0)
                     end
                 end
             end
