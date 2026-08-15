@@ -2294,7 +2294,7 @@ RunService.Heartbeat:Connect(function()
 end)
 
 -- âœ… RENDERSTEP: hanya visual & camera (perlu sync frame)
-RunService.RenderStepped:Connect(function()
+RunService.RenderStepped:Connect(function(dt)
     local root = getRoot()
     if not root then return end
 
@@ -2386,15 +2386,18 @@ RunService.RenderStepped:Connect(function()
                     local delta = (targetYaw - MoonwalkSmoothYaw + math.pi) % (2 * math.pi) - math.pi
                     MoonwalkSmoothYaw = MoonwalkSmoothYaw + delta * 0.35
 
-                    local baseCF = CFrame.new(hrp.Position) * CFrame.Angles(0, MoonwalkSmoothYaw, 0)
+                    local newPos = hrp.Position
+                    if moveDir then
+                        newPos = hrp.Position + moveDir * (Moonwalk.SlowSpeed * (dt or 1 / 60))
+                    end
+
+                    local baseCF = CFrame.new(newPos) * CFrame.Angles(0, MoonwalkSmoothYaw, 0)
 
                     if moveDir then
                         local angle = math.sin(tick() * Moonwalk.SpamSpeed) * Moonwalk.Intensity
                         hrp.CFrame = baseCF * CFrame.Angles(0, math.rad(angle), 0)
-                        hrp.AssemblyLinearVelocity = moveDir * Moonwalk.SlowSpeed
                     else
                         hrp.CFrame = baseCF
-                        hrp.AssemblyLinearVelocity = Vector3.new(0, hrp.AssemblyLinearVelocity.Y, 0)
                     end
                 end
             end
