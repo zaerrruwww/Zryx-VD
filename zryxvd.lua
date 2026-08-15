@@ -1,8 +1,26 @@
 ﻿-- LOAD LIB
 local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
-local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
-local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
-local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
+
+-- Xeno quirk fix: HttpGet added to game by Xeno can break scripts
+if getgenv and not getgenv().game then
+    getgenv().game = workspace.Parent or game
+end
+
+local function TryLoad(Url, Retries)
+    Retries = Retries or 3
+    for i = 1, Retries do
+        local ok, result = pcall(function()
+            return loadstring(game:HttpGet(Url))()
+        end)
+        if ok and result then return result end
+        task.wait(0.5)
+    end
+    error("Gagal memuat: " .. Url)
+end
+
+local Library = TryLoad(repo .. "Library.lua")
+local ThemeManager = TryLoad(repo .. "addons/ThemeManager.lua")
+local SaveManager = TryLoad(repo .. "addons/SaveManager.lua")
 -- =======================================
 Library.Scheme.AccentColor     = Color3.fromRGB(90, 120, 210)
 Library.Scheme.BackgroundColor = Color3.fromRGB(15, 15, 20)
