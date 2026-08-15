@@ -293,15 +293,11 @@ local MaskedPowers = {"Cobra", "Richter", "Brandon", "Rabbit", "Alex"}
 
 local Moonwalk = {
 Enabled = false,
-ShowButton = false,
 SpamSpeed = 30,
 Intensity = 35,
 SlowSpeed = 13,
 UseSlow = true
 }
-
-local MoonwalkConnection = nil
-local MoonwalkButton = nil
 
 local CameraZoom = {
     UnlimitedZoom = false,
@@ -1529,83 +1525,6 @@ or char:GetAttribute("IsDown") == true
 or char:GetAttribute("Knocked") == true
 end
 
-
-local function createMoonwalkButton()
-    -- âœ… FIX: ADD NULL CHECK
-    if not PlayerGui or not PlayerGui.Parent then return end
-    
-    if MoonwalkButton then MoonwalkButton:Destroy() end
-
-    local gui = Instance.new("ScreenGui")
-    gui.Name = "MoonwalkGui"
-    gui.ResetOnSpawn = false
-    gui.Parent = PlayerGui
-
-    -- ðŸ”¥ CONTAINER BUTTON
-    local btn = Instance.new("ImageButton")
-    btn.Size = UDim2.new(0, 50, 0, 50)
-    btn.Position = UDim2.new(0.65, 0, 0.75, 0)
-
-    -- BACKGROUND
-    btn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    btn.BackgroundTransparency = 0.9
-
-    -- ICON (IMAGE ONLY)
-    btn.Image = "rbxassetid://93349170559446"
-    btn.ImageTransparency = 0.1
-
-    btn.Parent = gui
-
-    -- BULAT
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(1, 0)
-    corner.Parent = btn
-
-    -- ðŸ”¥ OUTLINE DI BACKGROUND (INI YANG KAMU MAU)
-    local stroke = Instance.new("UIStroke")
-    stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border -- penting!
-    stroke.Thickness = 1.2
-    stroke.Color = Color3.fromRGB(255, 255, 255)
-    stroke.Transparency = 0.8
-    stroke.Parent = btn
-
-    -- TOGGLE
-btn.MouseButton1Click:Connect(function()
-    Moonwalk.Enabled = not Moonwalk.Enabled
-
-    local char = LocalPlayer.Character
-    local hum = char and char:FindFirstChildOfClass("Humanoid")
-
-    if Moonwalk.Enabled then
-        stroke.Color = Color3.fromRGB(170, 0, 255)
-
-        if not MoonwalkConnection then
-            startMoonwalk()
-        end
-
-    else
-        stroke.Color = Color3.fromRGB(255,255,255)
-
-        if hum then
-            if Movement.WalkSpeedEnabled then
-                hum.WalkSpeed = Movement.WalkSpeedValue
-            else
-                hum.WalkSpeed = 16
-            end
-        end
-    end
-end)
-
-    MoonwalkButton = gui
-end
-
-local function removeMoonwalkButton()
-if MoonwalkButton then
-MoonwalkButton:Destroy()
-MoonwalkButton = nil
-end
-end
-
 -- ================= AUTO SKILL CHECK =================
 
 local function pressSpace()
@@ -2580,10 +2499,6 @@ end
 
 end)
 
-if Moonwalk.ShowButton then
-createMoonwalkButton()
-end
-
 -- ================= UI ================
 -- INFO
 InfoBox:Paragraph({ Title = "Script: zryx" })
@@ -2830,67 +2745,6 @@ AbilityTab:Slider({
     Step = 0.1,
     Callback = function(v)
         FastVault.Speed = v
-    end
-})
-
-AbilityTab:Divider()
-
-AbilityTab:Toggle({
-    Flag = "MoonwalkButton",
-    Title = "MoonwalkButton",
-    Value = false,
-    Callback = function(v)
-        Moonwalk.ShowButton = v
-
-        if v then
-            createMoonwalkButton()
-        else
-            removeMoonwalkButton()
-        end
-    end
-})
-
-AbilityTab:Keybind({
-    Flag = "MoonwalkKey",
-    Title = "Moonwalk Keybind",
-    Value = Enum.KeyCode.V,
-    Callback = function()
-        Moonwalk.Enabled = not Moonwalk.Enabled
-
-        local char = LocalPlayer.Character
-        local hum = char and char:FindFirstChildOfClass("Humanoid")
-
-        if Moonwalk.Enabled then
-            startMoonwalk()
-        else
-            if hum then
-                if PlayerMods.Speed then
-                    hum.WalkSpeed = SpeedValue
-                else
-                    hum.WalkSpeed = 16
-                end
-            end
-        end
-    end
-})
-
-AbilityTab:Slider({
-    Flag = "MoonwalkSpamSpeed",
-    Title = "Spam Speed",
-    Value = { Min = 1, Max = 50, Default = Moonwalk.SpamSpeed },
-    Step = 1,
-    Callback = function(Value)
-        Moonwalk.SpamSpeed = Value
-    end
-})
-
-AbilityTab:Slider({
-    Flag = "MoonwalkIntensity",
-    Title = "Intensity",
-    Value = { Min = 1, Max = 50, Default = Moonwalk.Intensity },
-    Step = 0.1,
-    Callback = function(Value)
-        Moonwalk.Intensity = Value
     end
 })
 
