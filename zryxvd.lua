@@ -1,4 +1,4 @@
-﻿-- LOAD LIB
+-- LOAD LIB
 local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
 local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
 local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
@@ -125,13 +125,13 @@ local function CreateZryxVdToggleMenu(IconId)
     return MainButton, ScreenGui
 end
 
-CreateZryxVdToggleMenu(94272208451726)
+CreateZryxVdToggleMenu(93349170559446)
 -- =======================================
 -- WINDOW
 local Window = Library:CreateWindow({
 Title = "",
 Footer = "Violence District - Freemium",
-Icon = 94272208451726,
+Icon = 93349170559446,
 IconSize = UDim2.fromOffset(40, 40),
 CornerRadius = 20,
 NotifySide = "Right",
@@ -1808,7 +1808,7 @@ local function createMoonwalkButton()
     btn.BackgroundTransparency = 0.9
 
     -- ICON (IMAGE ONLY)
-    btn.Image = "rbxassetid://94272208451726"
+    btn.Image = "rbxassetid://93349170559446"
     btn.ImageTransparency = 0.1
 
     btn.Parent = gui
@@ -2722,7 +2722,7 @@ local function createEmoteButton()
     btn.Position = UDim2.new(0.55, 0, 0.75, 0)
     btn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     btn.BackgroundTransparency = 0.9
-    btn.Image = "rbxassetid://94272208451726"
+    btn.Image = "rbxassetid://93349170559446"
     btn.ImageTransparency = 0.1
     btn.Parent = gui
 
