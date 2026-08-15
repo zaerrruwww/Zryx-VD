@@ -2444,9 +2444,6 @@ RunService.RenderStepped:Connect(function()
                 local flatLook = Vector3.new(look.X, 0, look.Z)
                 if flatLook.Magnitude > 0 then
                     flatLook = flatLook.Unit
-                    local baseCF = CFrame.new(hrp.Position, hrp.Position + flatLook)
-                    local angle = math.sin(tick() * Moonwalk.SpamSpeed) * Moonwalk.Intensity
-                    hrp.CFrame = baseCF * CFrame.Angles(0, math.rad(angle), 0)
 
                     local move = Vector3.new(0, 0, 0)
                     if UserInputService:IsKeyDown(Enum.KeyCode.W) then
@@ -2455,6 +2452,23 @@ RunService.RenderStepped:Connect(function()
                     if UserInputService:IsKeyDown(Enum.KeyCode.S) then
                         move = move + Vector3.new(0, 0, -1)
                     end
+
+                    -- REVERSE MOONWALK: badan menghadap lawan arah gerak
+                    -- maju (W) -> badan menghadap mundur, tetap meluncur ke depan
+                    -- mundur (S) -> badan menghadap depan, tetap meluncur ke belakang
+                    local faceDir = flatLook
+                    if move.Magnitude > 0 then
+                        if move.Z > 0 then
+                            faceDir = -flatLook
+                        else
+                            faceDir = flatLook
+                        end
+                    end
+
+                    local baseCF = CFrame.new(hrp.Position, hrp.Position + faceDir)
+                    local angle = math.sin(tick() * Moonwalk.SpamSpeed) * Moonwalk.Intensity
+                    hrp.CFrame = baseCF * CFrame.Angles(0, math.rad(angle), 0)
+
                     if move.Magnitude > 0 then
                         humanoid:Move(move, true)
                     end
