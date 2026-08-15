@@ -20,10 +20,11 @@ Advanced Lua script for **Roblox Violence District** featuring Aimbot, Aimlock, 
 ## ✨ Features
 
 - **Combat**  
-  - Aimbot & Aimlock with adjustable strength and prediction  
-  - Selectable aim part (Head / HumanoidRootPart) and custom FOV  
+  - Aimbot & Aimlock with adjustable strength, prediction and target selection (All / Killer / Survivor / SCP)  
+  - Selectable aim part (Head / HumanoidRootPart), custom FOV and FOV circle  
   - Auto-parry that reacts to killer attack animations in real time  
-  - Kill All mode for killers with auto attack and auto carry  
+  - Auto carry & hook for killers  
+  - Masked powers (Cobra, Richter, Brandon, Rabbit, Alex) with activate/deactivate
 
 - **ESP System**  
   - Highlights Survivors, Killers, Generators, Pallets, Windows and SCPs  
@@ -32,19 +33,18 @@ Advanced Lua script for **Roblox Violence District** featuring Aimbot, Aimlock, 
   - Configurable radius for every ESP type  
 
 - **Survivor Utilities**  
-  - God Mode, Auto Skill Check, Auto Wiggle and Auto Flee  
-  - Fast vault and animation speed boost  
+  - God Mode, Auto Skill Check, Fast Vault and instant escape  
   - Morph avatar support  
+  - Auto Stalk (killer) to auto-track nearby survivors
 
 - **Movement**  
-  - WalkSpeed and JumpPower overrides with smart disabling during animations  
+  - WalkSpeed override with smart disabling during animations  
   - No Clip toggle  
-  - Moonwalk with custom keybind, spam speed and intensity  
+  - Moonwalk sway (no forward/backward movement) with keybind, spam speed and intensity
 
 - **Visuals & QoL**  
   - Ambient/clock controls, camera zoom and FOV  
-  - Emote player  
-  - Custom theme with save/load system  
+  - Custom theme with save/load system
 
 ---
 
@@ -81,13 +81,14 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/zaerrruwww/zryx-vd/ma
 | Option | Description |
 |--------|-------------|
 | **Aimbot / Aimlock** | Auto-aim at enemies while holding right click. |
+| **FOV Circle** | Shows the aimbot FOV radius on screen. |
 | **ESP** | Highlight players, generators, pallets, windows and SCPs. |
 | **Auto Parry** | Perfect parry against killer attacks automatically. |
 | **Auto Skill Check** | Hits perfect skill checks on generators. |
 | **God Mode** | Prevents death/down state. |
 | **No Clip** | Walk through walls. |
-| **Moonwalk** | Custom keybind movement spam. |
-| **WalkSpeed / JumpPower** | Movement speed and jump overrides. |
+| **Moonwalk** | In-place sway with custom keybind and intensity. |
+| **WalkSpeed** | Movement speed override. |
 | **Menu Keybind** | Custom key to open/close the UI (default: `Right Shift`). |
 | **Theme & Save** | UI appearance tweaks with persistent config. |
 
@@ -133,8 +134,8 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/zaerrruwww/zryx-vd/ma
 - **v1.0.0** – Initial release  
   - Aimbot, Aimlock & FOV with prediction  
   - Full ESP system with status & radius  
-  - Auto-parry, auto skill check, auto wiggle, auto flee  
-  - God Mode, No Clip, Moonwalk, walk speed & jump power  
+  - Auto-parry, auto skill check, god mode  
+  - No Clip, Moonwalk, walk speed override, masked powers  
   - Custom theme with save/load
 
 ---

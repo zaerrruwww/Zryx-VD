@@ -186,8 +186,6 @@ Tabs.Crosshair = PlayerSection:Tab({ Title = "Crosshair" })
 
 local MiscSection = Window:Section({ Title = "Misc", Opened = true })
 Tabs.Movement = MiscSection:Tab({ Title = "Movement" })
-Tabs.Emote = MiscSection:Tab({ Title = "Emote" })
-Tabs.Fun = MiscSection:Tab({ Title = "Fun" })
 
 Tabs.Visual = Window:Tab({ Title = "Visual" })
 Tabs.UISettings = Window:Tab({ Title = "UI Settings" })
@@ -203,8 +201,6 @@ local AimlockBox = Tabs.AimBot:Section({ Title = "AimBot", Opened = true })
 local ParryBox = Tabs.Parry:Section({ Title = "Parry", Opened = true })
 local CrosshairBox = Tabs.Crosshair:Section({ Title = "Crosshair", Opened = true })
 local MovementBox = Tabs.Movement:Section({ Title = "Movement", Opened = true })
-local EmoteBox = Tabs.Emote:Section({ Title = "Emote", Opened = true })
-local FunBox = Tabs.Fun:Section({ Title = "Fun", Opened = true })
 local VisualBox = Tabs.Visual:Section({ Title = "Graphics", Opened = true })
 local MorphAvaBox = Tabs.Visual:Section({ Title = "Morph Avatar", Opened = true })
 local TimeBox = Tabs.Visual:Section({ Title = "Clock & Ambient", Opened = true })
@@ -258,59 +254,36 @@ Survivor = Color3.fromRGB(60, 255, 120)    -- hijau
 }
 
 local Auto = {
-SkillCheck = false,
-Parry = false,
-ParryDelay = 0,
-ParryCooldown = 1,
-ParryDistance = 15,
-FaceSensitivity = 0.7,
-RequireFacing = true,
-Wiggle = false,
-WiggleSpam = 5
+    SkillCheck = false,
+    Parry = false,
+    ParryDelay = 0,
+    ParryCooldown = 1,
+    ParryDistance = 15,
+    FaceSensitivity = 0.7,
+    RequireFacing = true
 }
-
-local AutoFlee = {
-    Enabled = false,
-    DetectDistance = 50,
-    Cooldown = 0.1
-}
-
-local LastFlee = 0
 
 local GunAim = {
     Enabled = false,
     Holding = false,
-    TargetMode = "Killer", 
+    TargetMode = "All",
     Strength = 1,
     Predict = true,
     PredictStrength = 0.12,
     FOV = 250,
     VisibilityCheck = true,
     Target = nil,
-    AimPart = "HumanoidRootPart"
-}
-
-local AttackAim = {
-    Enabled = false,
-    Holding = false,
-    Strength = 1,
-    Predict = true,
-    PredictStrength = 0.12,
-    FOV = 250,
-    VisibilityCheck = true,
-    AimPart = "HumanoidRootPart"
+    AimPart = "HumanoidRootPart",
+    ShowFOVCircle = false
 }
 
 local Killer = {
-    KillAll = false,
-    AutoAttack = false,
     AutoCarry = false,
     KillRange = 500,
     AttackDelay = 0.45
 }
 
 local KillerBusy = false
-local KillerTarget = nil
 local ParryActive = false
 
 local Masked = {
@@ -387,9 +360,6 @@ local PlayerMods = {
 }
 
 local Movement = {
-    JumpPowerEnabled = false,
-    JumpPowerValue = 50,
-    OriginalJumpPower = 50,
     WalkSpeedEnabled = false,
     WalkSpeedValue = 17.6,
     OriginalWalkSpeed = 16,
@@ -470,18 +440,6 @@ end
 
 return bestHook
 
-end
-
-local function applyJumpPower()
-    if not Movement.JumpPowerEnabled then return end
-    
-    local char = LocalPlayer.Character
-    if not char then return end
-    
-    local hum = char:FindFirstChildOfClass("Humanoid")
-    if hum then
-        hum.JumpPower = Movement.JumpPowerValue
-    end
 end
 
 local function shouldDisableWalkSpeed()
@@ -601,7 +559,6 @@ end
 -- Auto apply saat respawn
 LocalPlayer.CharacterAdded:Connect(function()
     task.wait(0.8)
-    applyJumpPower()
     applyWalkSpeed()
 end)
 
@@ -654,7 +611,6 @@ end
 -- Auto apply saat respawn
 LocalPlayer.CharacterAdded:Connect(function()
     task.wait(0.8)
-    applyJumpPower()
     if Movement.NoClip then
         task.wait(0.3)
         toggleNoClip(true)
@@ -1108,60 +1064,6 @@ local function GetNearestKiller()
     return closest, shortest
 end
 
-local function GetFarthestGeneratorPoint(killerRoot)
-    if not killerRoot then
-        return nil
-    end
-
-    local bestPoint = nil
-    local farthestDistance = 0
-
-    for _, obj in ipairs(workspace:GetDescendants()) do
-
-        if obj:IsA("BasePart")
-        and string.match(obj.Name, "^GeneratorPoint%d+$") then
-
-            local dist =
-                (obj.Position - killerRoot.Position).Magnitude
-
-            if dist > farthestDistance then
-                farthestDistance = dist
-                bestPoint = obj
-            end
-        end
-    end
-
-    return bestPoint
-end
-
-local function AutoWiggle()
-    if not Auto.Wiggle then return end
-
-    local char = LocalPlayer.Character
-    if not char then return end
-
-    -- cek kondisi lagi digendong
-    local carried =
-        (char:FindFirstChild("IsCarried") and char.IsCarried.Value) or
-        (char:FindFirstChild("IsCarrying") and char.IsCarrying.Value)
-
-    if not carried then return end
-
-    local remotes = ReplicatedStorage:FindFirstChild("Remotes")
-    if not remotes then return end
-
-    local carry = remotes:FindFirstChild("Carry")
-    if not carry then return end
-
-    local event = carry:FindFirstChild("SelfUnHookEvent")
-    if not event then return end
-
-    -- ðŸ”¥ spam wiggle
-    for i = 1, Auto.WiggleSpam do
-        event:FireServer()
-    end
-end
-
 local lastParry = 0
 local PARRY_DEBOUNCE = 0.2
 
@@ -1220,37 +1122,17 @@ local function GetGunAimButton()
     return current
 end
 
-local function GetAttackAimButton()
-
-    for _, path in ipairs(AttackPaths) do
-
-        local current = PlayerGui
-
-        for segment in string.gmatch(path, "[^%.]+") do
-            current = current and current:FindFirstChild(segment)
-        end
-
-        if current and current:IsA("GuiObject") then
-            return current
-        end
-    end
-
-    return nil
-end
-
 -- ====== PC RIGHT CLICK HOLD DETECT ======
 UserInputService.InputBegan:Connect(function(input, gp)
     if gp then return end
     if input.UserInputType == Enum.UserInputType.MouseButton2 then
         GunAim.Holding = true
-        AttackAim.Holding = true
     end
 end)
 
 UserInputService.InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton2 then
         GunAim.Holding = false
-        AttackAim.Holding = false
     end
 end)
 
@@ -1435,7 +1317,11 @@ local function getClosestGunTarget()
 
             local valid = false
 
-            if GunAim.TargetMode == "Killer"
+            if GunAim.TargetMode == "All" then
+
+                valid = true
+
+            elseif GunAim.TargetMode == "Killer"
             and p.Team.Name == "Killer" then
 
                 valid = true
@@ -1538,65 +1424,8 @@ local function getClosestGunTarget()
     return closest
 end
 
-local function getClosestAttackTarget()
-
-    local cam = workspace.CurrentCamera
-
-    local center = Vector2.new(
-        cam.ViewportSize.X / 2,
-        cam.ViewportSize.Y / 2
-    )
-
-    local closest = nil
-    local shortest = AttackAim.FOV
-
-    for _, p in ipairs(Players:GetPlayers()) do
-
-        if p ~= LocalPlayer
-        and p.Team
-        and p.Team.Name == "Survivors"
-        and p.Character then
-
-            local hrp =
-                p.Character:FindFirstChild(
-                    AttackAim.AimPart
-                )
-
-            local hum =
-                p.Character:FindFirstChildOfClass(
-                    "Humanoid"
-                )
-
-            if hrp and hum and hum.Health > 0 then
-
-                local pos, visible =
-                    cam:WorldToViewportPoint(
-                        hrp.Position
-                    )
-
-                if visible then
-
-                    local dist =
-                        (
-                            Vector2.new(pos.X, pos.Y)
-                            - center
-                        ).Magnitude
-
-                    if dist < shortest then
-                        shortest = dist
-                        closest = hrp
-                    end
-                end
-            end
-        end
-    end
-
-    return closest
-end
-
 
 local GunAimConnection = nil
-
 local function startGunAim()
 
     if GunAimConnection then
@@ -1652,46 +1481,6 @@ local function startGunAim()
         end)
 end
 
-local AttackAimConnection
-
-local function startAttackAim()
-
-    if AttackAimConnection then
-        return
-    end
-
-    AttackAimConnection =
-        RunService.RenderStepped:Connect(function()
-
-            if not AttackAim.Enabled then return end
-            if not AttackAim.Holding then return end
-
-            local target =
-                getClosestAttackTarget()
-
-            if not target then return end
-
-            local cam = workspace.CurrentCamera
-
-            local pos = target.Position
-
-            if AttackAim.Predict then
-                pos =
-                    pos +
-                    (
-                        target.AssemblyLinearVelocity
-                        * AttackAim.PredictStrength
-                    )
-            end
-
-            cam.CFrame =
-                CFrame.new(
-                    cam.CFrame.Position,
-                    pos
-                )
-        end)
-end
-
 local GunAimButtonConnection = nil
 local CurrentGunButton = nil
 
@@ -1734,40 +1523,6 @@ task.spawn(function()
                 or input.UserInputType == Enum.UserInputType.MouseButton2 then
 
                     GunAim.Holding = false
-                end
-            end)
-        end
-    end
-end)
-
-local CurrentAttackButton = nil
-
-task.spawn(function()
-
-    while true do
-        task.wait(1)
-
-        local btn = GetAttackAimButton()
-
-        if btn and btn ~= CurrentAttackButton then
-
-            CurrentAttackButton = btn
-
-            btn.InputBegan:Connect(function(input)
-
-                if input.UserInputType ==
-                    Enum.UserInputType.Touch then
-
-                    AttackAim.Holding = true
-                end
-            end)
-
-            btn.InputEnded:Connect(function(input)
-
-                if input.UserInputType ==
-                    Enum.UserInputType.Touch then
-
-                    AttackAim.Holding = false
                 end
             end)
         end
@@ -2003,66 +1758,6 @@ local function stopAutoStalk()
     end
 end
 
-task.spawn(function()
-
-    while task.wait(0.2) do
-
-        if not AutoFlee.Enabled then
-            continue
-        end
-
-        local root = getRoot()
-
-        if not root then
-            continue
-        end
-
-        local killerRoot, distance =
-            GetNearestKiller()
-
-        if killerRoot
-        and distance <= AutoFlee.DetectDistance
-        and tick() - LastFlee > AutoFlee.Cooldown then
-
-            local point =
-                GetFarthestGeneratorPoint(killerRoot)
-
-            if point then
-
-                LastFlee = tick()
-
-                root.CFrame =
-                    point.CFrame +
-                    Vector3.new(0, 5, 0)
-            end
-        end
-    end
-end)
-
-local function GetNearestAliveSurvivor()
-    local root = getRoot()
-    if not root then return nil end
-
-    local closest, shortest = nil, math.huge
-
-    for _, plr in pairs(Players:GetPlayers()) do
-        if plr ~= LocalPlayer and plr.Character then
-            local hum = plr.Character:FindFirstChildOfClass("Humanoid")
-            local hrp = plr.Character:FindFirstChild("HumanoidRootPart")
-
-            if hum and hrp and hum.Health > 30 then
-                local d = (hrp.Position - root.Position).Magnitude
-                if d < shortest then
-                    shortest = d
-                    closest = plr.Character
-                end
-            end
-        end
-    end
-
-    return closest
-end
-
 local function applyUnlimitedZoom()
     if CameraZoom.UnlimitedZoom then
         LocalPlayer.CameraMaxZoomDistance = CameraZoom.MaxDistance
@@ -2084,84 +1779,6 @@ local function applyCameraFOV()
         cam.FieldOfView = CameraZoom.DefaultFOV
     end
 end
-
--- ================= JERK TOOL =================
-local JerkTool = {
-    Enabled = false,
-    ToolName = "Jerk Off"
-}
-
-local currentJerkTool = nil
-local jerkConnection = nil
-
-local function createJerkTool()
-    if currentJerkTool then currentJerkTool:Destroy() end
-
-    local speaker = LocalPlayer
-    local character = speaker.Character
-    if not character then return end
-
-    local humanoid = character:FindFirstChildWhichIsA("Humanoid")
-    local backpack = speaker:FindFirstChildWhichIsA("Backpack")
-    if not humanoid or not backpack then return end
-
-    local tool = Instance.new("Tool")
-    tool.Name = JerkTool.ToolName
-    tool.ToolTip = "in the stripped club. straight up \"jorking it\" . and by \"it\" , haha, well. let's just say. My peanits."
-    tool.RequiresHandle = false
-    tool.Parent = backpack
-
-    currentJerkTool = tool
-
-    local jorkin = false
-    local track = nil
-
-    local function stopTomfoolery()
-        jorkin = false
-        if track then
-            track:Stop()
-            track = nil
-        end
-    end
-
-    tool.Equipped:Connect(function() jorkin = true end)
-    tool.Unequipped:Connect(stopTomfoolery)
-    humanoid.Died:Connect(stopTomfoolery)
-
-    -- Animation loop
-    task.spawn(function()
-        while task.wait() do
-            if not JerkTool.Enabled or not jorkin then 
-                if track then track:Stop() end
-                continue 
-            end
-
-            local isR15 = humanoid.RigType == Enum.HumanoidRigType.R15
-            if not track then
-                local anim = Instance.new("Animation")
-                anim.AnimationId = not isR15 and "rbxassetid://72042024" or "rbxassetid://698251653"
-                track = humanoid:LoadAnimation(anim)
-            end
-
-            track:Play()
-            track:AdjustSpeed(isR15 and 0.7 or 0.65)
-            track.TimePosition = 0.6
-            task.wait(0.1)
-            while track and track.TimePosition < (not isR15 and 0.65 or 0.7) do 
-                task.wait(0.1) 
-            end
-            if track then track:Stop() end
-        end
-    end)
-end
-
--- Auto recreate on respawn
-LocalPlayer.CharacterAdded:Connect(function()
-    task.wait(1)
-    if JerkTool.Enabled then
-        createJerkTool()
-    end
-end)
 
 -- ================= AVATAR STEALER FUNCTIONS =================
 local function saveOriginalAppearance()
@@ -2405,7 +2022,7 @@ local Crosshair = {
     Color = Color3.fromRGB(255,255,255),
     Style = "Plus",
     OffsetX = 0,
-    OffsetY = 0
+    OffsetY = 6
 }
 
 local CrosshairDrawings = {}
@@ -2415,6 +2032,34 @@ for _,v in pairs(CrosshairDrawings) do
 if v.Remove then v:Remove() end
 end
 CrosshairDrawings = {}
+end
+
+local FOVCircle = nil
+
+local function drawFOVCircle()
+
+    if not GunAim.ShowFOVCircle then
+        if FOVCircle then
+            FOVCircle.Visible = false
+        end
+        return
+    end
+
+    if not FOVCircle then
+        FOVCircle = Drawing.new("Circle")
+        FOVCircle.Filled = false
+        FOVCircle.Thickness = 1
+        FOVCircle.Color = Color3.fromRGB(255, 255, 255)
+        FOVCircle.Visible = true
+    end
+
+    local cam = workspace.CurrentCamera
+    FOVCircle.Position = Vector2.new(
+        cam.ViewportSize.X / 2,
+        cam.ViewportSize.Y / 2
+    )
+    FOVCircle.Radius = GunAim.FOV
+    FOVCircle.Visible = true
 end
 
 local created = false
@@ -2671,108 +2316,6 @@ workspace.DescendantRemoving:Connect(removeCache)
 local currentTarget = nil
 local carryBusy = false
 
-
--- ======== EMOTE SYSTEM =================
-
-local Emote = {
-    Selected = "Mannrobics"
-}
-
-local EmoteButton = {
-    Show = false,
-    GuiInstance = nil
-}
-
-local EmoteList = {
-    "Mannrobics",
-    "Arm Swing",
-    "Schadenfreude",
-    "Kyoufuu",
-    "Backflip",
-    "Griddy",
-    "Friday Night",
-    "Floating Rest",
-    "OnePlays",
-    "Quick Combo",
-    "WarCry",
-    "Wave"
-}
-
-local EmoteRemote =
-    ReplicatedStorage
-    :WaitForChild("Remotes")
-    :WaitForChild("EmoteHandler")
-
-local function playEmote(name)
-    pcall(function()
-        EmoteRemote:FireServer(name)
-    end)
-end
-
-local function createEmoteButton()
-    if EmoteButton.GuiInstance then
-        EmoteButton.GuiInstance:Destroy()
-    end
-
-    local gui = Instance.new("ScreenGui")
-    gui.Name = "EmoteButtonGui"
-    gui.ResetOnSpawn = false
-    gui.Parent = PlayerGui
-
-    local btn = Instance.new("ImageButton")
-    btn.Size = UDim2.new(0, 50, 0, 50)
-    btn.Position = UDim2.new(0.55, 0, 0.75, 0)
-    btn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    btn.BackgroundTransparency = 0.9
-    btn.Image = "rbxassetid://93349170559446"
-    btn.ImageTransparency = 0.1
-    btn.Parent = gui
-
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(1, 0)
-    corner.Parent = btn
-
-    local stroke = Instance.new("UIStroke")
-    stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-    stroke.Thickness = 1.2
-    stroke.Color = Color3.fromRGB(255, 255, 255)
-    stroke.Transparency = 0.8
-    stroke.Parent = btn
-
-    -- Label nama emote
-    local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(0, 80, 0, 20)
-    label.Position = UDim2.new(0.5, -40, -0.6, 0)
-    label.BackgroundTransparency = 1
-    label.Text = Emote.Selected
-    label.TextColor3 = Color3.fromRGB(255, 255, 255)
-    label.TextStrokeTransparency = 0.5
-    label.Font = Enum.Font.GothamBold
-    label.TextSize = 11
-    label.Parent = btn
-
-    btn.MouseButton1Click:Connect(function()
-        playEmote(Emote.Selected)
-
-        -- flash efek
-        stroke.Color = Color3.fromRGB(90, 120, 210)
-        task.delay(0.3, function()
-            stroke.Color = Color3.fromRGB(255, 255, 255)
-        end)
-    end)
-
-    EmoteButton.GuiInstance = gui
-    EmoteButton.LabelRef = label
-end
-
-local function removeEmoteButton()
-    if EmoteButton.GuiInstance then
-        EmoteButton.GuiInstance:Destroy()
-        EmoteButton.GuiInstance = nil
-        EmoteButton.LabelRef = nil
-    end
-end
-
 -- ================ MAIN LOOP (OPTIMIZED) =================
 
 local lastESPUpdate = 0
@@ -2787,19 +2330,11 @@ RunService.Heartbeat:Connect(function()
     if now - lastGodMode >= 0.1 then
         lastGodMode = now
         applyGodMode()
-        AutoWiggle()
     end
 
     -- KILLER SYSTEM (cukup 20x/detik)
     if now - lastKillerUpdate >= 0.05 then
         lastKillerUpdate = now
-
-        -- AUTO ATTACK
-        if Killer.AutoAttack then
-            pcall(function()
-                AttackEvent:FireServer(false)
-            end)
-        end
 
         -- AUTO CARRY + HOOK
         if Killer.AutoCarry and not KillerBusy then
@@ -2830,30 +2365,6 @@ RunService.Heartbeat:Connect(function()
             end
 
             task.delay(2, function() KillerBusy = false end)
-        end
-
-        -- AUTO KILL ALL
-        if Killer.KillAll then
-            local root = getRoot()
-            if root then
-                if not KillerTarget
-                or not KillerTarget:FindFirstChild("Humanoid")
-                or KillerTarget.Humanoid.Health <= 35 then
-                    KillerTarget = GetNearestAliveSurvivor()
-                end
-
-                if KillerTarget then
-                    local targetHRP = KillerTarget:FindFirstChild("HumanoidRootPart")
-                    if targetHRP then
-                        local velocity = targetHRP.AssemblyLinearVelocity
-                        local predict = velocity * 0.15
-                        local targetPos = targetHRP.Position + predict
-                        local behind = targetHRP.CFrame.LookVector * -3
-                        root.CFrame = CFrame.new(targetPos + behind, targetPos)
-                    end
-                    pcall(function() AttackEvent:FireServer(false) end)
-                end
-            end
         end
 
         -- WALK SPEED
@@ -2933,6 +2444,7 @@ RunService.RenderStepped:Connect(function()
     end
 
     -- CROSSHAIR & MOONWALK: tetap setiap frame (butuh smooth)
+    drawFOVCircle()
     drawCrosshair()
 
     if Moonwalk.Enabled and not ParryActive and not isDowned() then
@@ -2954,7 +2466,6 @@ RunService.RenderStepped:Connect(function()
                     local baseCF = CFrame.new(hrp.Position, hrp.Position + flatLook)
                     local angle = math.sin(tick() * Moonwalk.SpamSpeed) * Moonwalk.Intensity
                     hrp.CFrame = baseCF * CFrame.Angles(0, math.rad(angle), 0)
-                    humanoid:Move(Vector3.new(0, 0, 1), true)
                 end
             end
         end
@@ -3287,7 +2798,7 @@ CrosshairBox:Slider({
 CrosshairBox:Slider({
     Flag = "CrosshairPosY",
     Title = "Position Y",
-    Value = { Min = -100, Max = 100, Default = 0 },
+    Value = { Min = -100, Max = 100, Default = 6 },
     Step = 1,
     Callback = function(v)
         Crosshair.OffsetY = v
@@ -3305,24 +2816,6 @@ AbilityTab:Toggle({
     Callback = function(v)
         Auto.SkillCheck = v
         if v then startSkillCheck() end
-    end
-})
-
-AbilityTab:Toggle({
-    Flag = "AutoWiggle",
-    Title = "Auto Wiggle",
-    Value = false,
-    Callback = function(v)
-        Auto.Wiggle = v
-    end
-})
-
-AbilityTab:Toggle({
-    Flag = "AutoFleeKiller",
-    Title = "Auto Flee Killer",
-    Value = false,
-    Callback = function(v)
-        AutoFlee.Enabled = v
     end
 })
 
@@ -3433,37 +2926,6 @@ KillerTab:Toggle({
         else
             stopAutoStalk()
         end
-    end
-})
-
-KillerTab:Toggle({
-    Flag = "AttackAim",
-    Title = "AimLock Attack",
-    Value = false,
-    Callback = function(v)
-        AttackAim.Enabled = v
-
-        if v then
-            startAttackAim()
-        end
-    end
-})
-
-KillerTab:Toggle({
-    Flag = "KillAll",
-    Title = "Auto Kill All",
-    Value = false,
-    Callback = function(v)
-        Killer.KillAll = v
-    end
-})
-
-KillerTab:Toggle({
-    Flag = "AutoAttack",
-    Title = "Auto Spam Attack",
-    Value = false,
-    Callback = function(v)
-        Killer.AutoAttack = v
     end
 })
 
@@ -3590,6 +3052,7 @@ AimlockBox:Dropdown({
     Flag = "GunAimTarget",
     Title = "Target",
     Values = {
+        "All",
         "Killer",
         "Survivor",
         "SCP"
@@ -3597,6 +3060,15 @@ AimlockBox:Dropdown({
     Value = 1,
     Callback = function(v)
         GunAim.TargetMode = v
+    end
+})
+
+AimlockBox:Toggle({
+    Flag = "GunAimFOVCircle",
+    Title = "FOV Circle",
+    Value = false,
+    Callback = function(v)
+        GunAim.ShowFOVCircle = v
     end
 })
 
@@ -3673,91 +3145,6 @@ MovementBox:Toggle({
     Value = false,
     Callback = function(v)
         toggleNoClip(v)
-    end
-})
-
-MovementBox:Toggle({
-    Flag = "JumpPowerToggle",
-    Title = "Custom Jump Power",
-    Value = false,
-    Callback = function(v)
-        Movement.JumpPowerEnabled = v
-        if v then
-            applyJumpPower()
-        else
-            -- Kembalikan ke default
-            local char = LocalPlayer.Character
-            local hum = char and char:FindFirstChildOfClass("Humanoid")
-            if hum then
-                hum.JumpPower = Movement.OriginalJumpPower
-            end
-        end
-    end
-})
-
-MovementBox:Slider({
-    Flag = "JumpPowerSlider",
-    Title = "Jump Power Value",
-    Value = { Min = 0, Max = 300, Default = 50 },
-    Step = 1,
-    Callback = function(v)
-        Movement.JumpPowerValue = v
-        if Movement.JumpPowerEnabled then
-            applyJumpPower()
-        end
-    end
-})
-
-EmoteBox:Dropdown({
-    Flag = "SelectEmote",
-    Title = "Select Emote",
-    Values = EmoteList,
-    Value = 1,
-    Callback = function(v)
-        Emote.Selected = v
-        -- update label di GUI button
-        if EmoteButton.LabelRef then
-            EmoteButton.LabelRef.Text = v
-        end
-    end
-})
-
-EmoteBox:Button({
-    Title = "Play Emote",
-    Callback = function()
-        playEmote(Emote.Selected)
-    end
-})
-
-EmoteBox:Toggle({
-    Flag = "ShowEmoteButton",
-    Title = "Show Emote Button",
-    Value = false,
-    Callback = function(v)
-        EmoteButton.Show = v
-        if v then
-            createEmoteButton()
-        else
-            removeEmoteButton()
-        end
-    end
-})
-
--- ======== FUN / TROLL =================
-FunBox:Toggle({
-    Flag = "JerkTool",
-    Title = "Jerk Tool",
-    Value = false,
-    Callback = function(v)
-        JerkTool.Enabled = v
-        if v then
-            createJerkTool()
-        else
-            if currentJerkTool then
-                currentJerkTool:Destroy()
-                currentJerkTool = nil
-            end
-        end
     end
 })
 
