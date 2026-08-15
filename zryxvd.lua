@@ -236,16 +236,14 @@ Killer = false,
 Generator = false,
 Pallet = false,
 Window = false,
-SCP = false,
-Distance = 100
+SCP = false
 }
 
 local ESPStatus = {
 Enabled = false,
 ShowName = true,
 ShowDistance = true,
-ShowHealth = false,
-Radius = 100
+ShowHealth = false
 }
 
 local TeamColors = {
@@ -742,9 +740,6 @@ local GeneratorColor = Color3.fromRGB(255, 170, 0)
 local PalletColor = Color3.fromRGB(74, 255, 181)
 local WindowColor = Color3.fromRGB(74, 255, 181)
 local SCPColor = Color3.fromRGB(255, 0, 0)
-local MAX_DISTANCE = function()
-    return ESP.Distance
-end
 
 local function GetGameValue(obj, name)
 if not obj then return nil end
@@ -856,11 +851,9 @@ end
 
 if not pos then return end
 
-local distance = (pos - root.Position).Magnitude
-
 -- WINDOW
 if obj.Name == "Window" then
-if ESP.Window and distance <= MAX_DISTANCE() then
+if ESP.Window then
 createESP(obj, WindowColor)
 else
 removeESP(obj)
@@ -869,7 +862,7 @@ end
 
 -- PALLET
 if obj.Name == "Pallet" or obj.Name == "Palletwrong" then
-if ESP.Pallet and distance <= MAX_DISTANCE() then
+if ESP.Pallet then
 createESP(obj, PalletColor)
 else
 removeESP(obj)
@@ -908,11 +901,6 @@ or char:GetAttribute("IsDown") == true
 or char:GetAttribute("Knocked") == true
 
 local dist = (head.Position - root.Position).Magnitude
-
-if dist > ESPStatus.Radius then
-removeStatusESP(char)
-return
-end
 
 local text = ""
 
@@ -1021,9 +1009,7 @@ local function UpdateSCPEsp(root)
             end
 
             if pos then
-                local dist = (pos - root.Position).Magnitude
-
-                if dist <= ESP.Distance then
+                if ESP.SCP then
                     createESP(obj, SCPColor)
                 else
                     removeESP(obj)
@@ -2406,15 +2392,10 @@ RunService.RenderStepped:Connect(function()
                 if hum and hum.Health > 0 then
                     local hrp = char:FindFirstChild("HumanoidRootPart")
                     if hrp then
-                        local distance = (hrp.Position - root.Position).Magnitude
-                        if distance <= ESP.Distance then
-                            if ESP.Survivor and p.Team and p.Team.Name == "Survivors" then
-                                createESP(char, TeamColors.Survivor)
-                            elseif ESP.Killer and p.Team and p.Team.Name == "Killer" then
-                                createESP(char, TeamColors.Killer)
-                            else
-                                removeESP(char)
-                            end
+                        if ESP.Survivor and p.Team and p.Team.Name == "Survivors" then
+                            createESP(char, TeamColors.Survivor)
+                        elseif ESP.Killer and p.Team and p.Team.Name == "Killer" then
+                            createESP(char, TeamColors.Killer)
                         else
                             removeESP(char)
                         end
@@ -2700,16 +2681,6 @@ ESPBox:Colorpicker({
     end
 })
 
-ESPBox:Slider({
-    Flag = "ESPDistance",
-    Title = "ESP Radius",
-    Value = { Min = 10, Max = 1000, Default = 100 },
-    Step = 1,
-    Callback = function(v)
-        ESP.Distance = v
-    end
-})
-
 ESPStatusBox:Toggle({
     Flag = "EnableStatus",
     Title = "Enable Status ESP",
@@ -2743,16 +2714,6 @@ ESPStatusBox:Toggle({
     Value = false,
     Callback = function(v)
         ESPStatus.ShowHealth = v
-    end
-})
-
-ESPStatusBox:Slider({
-    Flag = "StatusRadius",
-    Title = "Status Radius",
-    Value = { Min = 20, Max = 500, Default = 100 },
-    Step = 1,
-    Callback = function(v)
-        ESPStatus.Radius = v
     end
 })
 

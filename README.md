@@ -30,7 +30,7 @@ Advanced Lua script for **Roblox Violence District** featuring Aimbot, Aimlock, 
   - Highlights Survivors, Killers, Generators, Pallets, Windows and SCPs  
   - Generator repair percentage shown directly above the machine  
   - Optional status ESP displaying name, distance and health  
-  - Configurable radius for every ESP type  
+  - All ESP types render regardless of distance
 
 - **Survivor Utilities**  
   - God Mode, Auto Skill Check, Fast Vault and instant escape  
@@ -133,7 +133,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/zaerrruwww/zryx-vd/ma
 
 - **v1.0.0** – Initial release  
   - Aimbot, Aimlock & FOV with prediction  
-  - Full ESP system with status & radius  
+  - Full ESP system with status  
   - Auto-parry, auto skill check, god mode  
   - No Clip, Moonwalk, walk speed override, masked powers  
   - Custom theme with save/load
