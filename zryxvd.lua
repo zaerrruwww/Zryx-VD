@@ -1508,7 +1508,7 @@ task.spawn(function()
 
                     GunAim.Holding = false
                 end
-            end)
+            end
         end
     end
 end)
@@ -2357,6 +2357,7 @@ RunService.RenderStepped:Connect(function()
             local cam = workspace.CurrentCamera
 
             if humanoid and hrp and cam then
+                humanoid.AutoRotate = false
                 if Moonwalk.UseSlow and humanoid.WalkSpeed ~= Moonwalk.SlowSpeed then
                     humanoid.WalkSpeed = Moonwalk.SlowSpeed
                 end
@@ -2395,6 +2396,14 @@ RunService.RenderStepped:Connect(function()
                         hrp.CFrame = baseCF
                     end
                 end
+            end
+        end
+    else
+        local char = LocalPlayer.Character
+        if char then
+            local humanoid = char:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid.AutoRotate = true
             end
         end
     end
