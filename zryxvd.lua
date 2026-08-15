@@ -3134,6 +3134,15 @@ MovementBox:Toggle({
     end
 })
 
+MovementBox:Toggle({
+    Flag = "BasicMoonwalk",
+    Title = "Basic Moonwalk",
+    Value = false,
+    Callback = function(v)
+        Moonwalk.Enabled = v
+    end
+})
+
 -- == AVATAR STEALER UI =================
 MorphAvaBox:Input({
     Flag = "StealUsername",
