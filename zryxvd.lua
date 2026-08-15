@@ -10,6 +10,42 @@ Library.Scheme.MainColor       = Color3.fromRGB(55, 60, 80)
 Library.Scheme.OutlineColor    = Color3.fromRGB(70, 85, 130)
 Library.Scheme.FontColor       = Color3.fromRGB(200, 215, 255)
 -- =======================================
+-- COMPATIBILITY MODE (XENO)
+local CompatibilityMode = false
+
+local function detectXeno()
+    local ok, name = pcall(function()
+        return getexecutorname and getexecutorname() or ""
+    end)
+    if ok and type(name) == "string" and name:lower():find("xeno", 1, true) then
+        return true
+    end
+    local genv = getgenv and getgenv() or shared
+    if genv and genv.Xeno then
+        return true
+    end
+    return false
+end
+
+CompatibilityMode = detectXeno()
+
+if CompatibilityMode then
+    task.defer(function()
+        if Library and Library.Notify then
+            Library:Notify({
+                Title = "Compatibility Mode",
+                Text = "Network hooks disabled for Xeno compatibility",
+                Duration = 5
+            })
+        end
+    end)
+end
+
+local function NetworkFire(Remote, ...)
+    if CompatibilityMode then return end
+    Remote:FireServer(...)
+end
+-- =======================================
 -- ZRYX VD TOGGLE MENU
 local function CreateZryxVdToggleMenu(IconId)
 
@@ -1156,7 +1192,7 @@ local function AutoWiggle()
 
     -- ðŸ”¥ spam wiggle
     for i = 1, Auto.WiggleSpam do
-        event:FireServer()
+        NetworkFire(event)
     end
 end
 
@@ -1988,7 +2024,7 @@ local function startAutoStalk()
 
         if stalkEvent then
             pcall(function()
-                stalkEvent:FireServer(target)
+                NetworkFire(stalkEvent, target)
             end)
         end
     end)
@@ -2703,7 +2739,7 @@ local EmoteRemote =
 
 local function playEmote(name)
     pcall(function()
-        EmoteRemote:FireServer(name)
+        NetworkFire(EmoteRemote, name)
     end)
 end
 
@@ -2795,7 +2831,7 @@ RunService.Heartbeat:Connect(function()
         -- AUTO ATTACK
         if Killer.AutoAttack then
             pcall(function()
-                AttackEvent:FireServer(false)
+                NetworkFire(AttackEvent, false)
             end)
         end
 
@@ -2811,7 +2847,7 @@ RunService.Heartbeat:Connect(function()
                     root.CFrame = tRoot.CFrame * CFrame.new(0, 3, -2)
                     task.wait(0.4)
                     for i = 1, 4 do
-                        CarryEvent:FireServer(target)
+                        NetworkFire(CarryEvent, target)
                         task.wait(0.2)
                     end
                     task.wait(0.6)
@@ -2820,7 +2856,7 @@ RunService.Heartbeat:Connect(function()
                         root.CFrame = hook.CFrame * CFrame.new(0, 4, -3)
                         task.wait(0.7)
                         for i = 1, 6 do
-                            HookEvent:FireServer(hook)
+                            NetworkFire(HookEvent, hook)
                             task.wait(0.15)
                         end
                     end
@@ -2849,7 +2885,7 @@ RunService.Heartbeat:Connect(function()
                         local behind = targetHRP.CFrame.LookVector * -3
                         root.CFrame = CFrame.new(targetPos + behind, targetPos)
                     end
-                    pcall(function() AttackEvent:FireServer(false) end)
+                    pcall(function() NetworkFire(AttackEvent, false) end)
                 end
             end
         end
@@ -3501,7 +3537,7 @@ KillerTab:AddButton("Activate Power", function()
         and ReplicatedStorage.Remotes.Killers.Masked:FindFirstChild("Activatepower")
     
     if Event then
-        Event:FireServer(Masked.CurrentPower)
+        NetworkFire(Event, Masked.CurrentPower)
     else
     end
 end)
@@ -3513,7 +3549,7 @@ KillerTab:AddButton("Deactivate Power", function()
         and ReplicatedStorage.Remotes.Killers.Masked:FindFirstChild("Deactivatepower")
     
     if Event then
-        Event:FireServer()
+        NetworkFire(Event)
     else
     end
 end)
