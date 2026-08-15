@@ -2364,32 +2364,33 @@ RunService.RenderStepped:Connect(function()
                 if flatLook.Magnitude > 0 then
                     flatLook = flatLook.Unit
 
-                    local move = Vector3.new(0, 0, 0)
+                    local move = nil
                     if UserInputService:IsKeyDown(Enum.KeyCode.W) then
-                        move = move + Vector3.new(0, 0, 1)
-                    end
-                    if UserInputService:IsKeyDown(Enum.KeyCode.S) then
-                        move = move + Vector3.new(0, 0, -1)
+                        move = flatLook
+                    elseif UserInputService:IsKeyDown(Enum.KeyCode.S) then
+                        move = -flatLook
                     end
 
                     -- REVERSE MOONWALK: badan menghadap lawan arah gerak
                     -- maju (W) -> badan menghadap mundur, tetap meluncur ke depan
                     -- mundur (S) -> badan menghadap depan, tetap meluncur ke belakang
-                    local faceDir = flatLook
-                    if move.Magnitude > 0 then
-                        if move.Z > 0 then
+                    local faceDir
+                    if move then
+                        if move == flatLook then
                             faceDir = -flatLook
                         else
                             faceDir = flatLook
                         end
+                    else
+                        faceDir = flatLook
                     end
 
                     local baseCF = CFrame.new(hrp.Position, hrp.Position + faceDir)
                     local angle = math.sin(tick() * Moonwalk.SpamSpeed) * Moonwalk.Intensity
                     hrp.CFrame = baseCF * CFrame.Angles(0, math.rad(angle), 0)
 
-                    if move.Magnitude > 0 then
-                        humanoid:Move(move, true)
+                    if move then
+                        humanoid:Move(move, false)
                     end
                 end
             end
