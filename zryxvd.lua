@@ -1,4 +1,3 @@
-﻿-- LOAD LIB
 local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
 
 -- Xeno fix: game:HttpGet is broken in Xeno, use request/syn.request first
