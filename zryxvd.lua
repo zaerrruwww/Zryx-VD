@@ -15,11 +15,30 @@ local function Fetch(Url)
     return game:HttpGet(Url)
 end
 
+-- Replace Obsidian's internal game:HttpGet (broken on Xeno) with request-based fetch
+local function SafeHttpGet(Url)
+    local requestFn = request or syn.request or http_request
+    if requestFn then
+        local ok, res = pcall(function()
+            return requestFn({ Url = Url })
+        end)
+        if ok and res and (res.StatusCode == 200 or res.StatusCode == 304) then
+            return res.Body or res.body
+        end
+    end
+    return game:HttpGet(Url)
+end
+
+local genv = getgenv and getgenv() or _G
+genv.__SafeHttpGet = SafeHttpGet
+
 local function TryLoad(Url, Retries)
     Retries = Retries or 3
     for i = 1, Retries do
         local ok, result = pcall(function()
-            return loadstring(Fetch(Url))()
+            local source = Fetch(Url)
+            source = source:gsub("game:HttpGet", "__SafeHttpGet")
+            return loadstring(source)()
         end)
         if ok and result then return result end
         task.wait(0.5)
@@ -902,7 +921,7 @@ end
 local function UpdateGenerator(generator)
 if not generator or not generator.Parent then return end
 
--- kalau ESP mati â†’ hapus
+-- kalau ESP mati -> hapus
 if not ESP.Generator then
 local old = generator:FindFirstChild("GenESP")
 if old then old:Destroy() end
@@ -1022,7 +1041,7 @@ end
 local text = ""
 
 if isDown then
-text = "ðŸ”» DOWN\n"
+text = "v DOWN\n"
 end
 
 if ESPStatus.ShowName then
@@ -1217,7 +1236,7 @@ local function AutoWiggle()
     local event = carry:FindFirstChild("SelfUnHookEvent")
     if not event then return end
 
-    -- ðŸ”¥ spam wiggle
+    -- spam wiggle
     for i = 1, Auto.WiggleSpam do
         NetworkFire(event)
     end
@@ -1332,7 +1351,7 @@ local function pressParryButton()
             VirtualInputManager:SendTouchEvent(8823, 2, x, y)
         end
     else
-        -- PC â†’ klik kanan
+        -- PC -> klik kanan
         pressRightClick()
     end
 end
@@ -1344,14 +1363,14 @@ lastParry = now
 
 ParryActive = true  
 
--- ðŸ”¥ STOP MOONWALK LANGSUNG  
+-- STOP MOONWALK LANGSUNG  
 if Moonwalk.Enabled then  
     Moonwalk.Enabled = false  
 end  
 
 pressParryButton()  
 
--- ðŸ”¥ tunggu lebih lama (biar anim selesai)  
+-- tunggu lebih lama (biar anim selesai)  
 task.delay(0.3, function()  
     ParryActive = false  
 end)
@@ -1381,7 +1400,7 @@ local enemyRoot = targetChar:FindFirstChild("HumanoidRootPart")
 
 if not myRoot or not enemyRoot then return false end  
 
--- ðŸ”¥ arah depan killer  
+-- arah depan killer  
 local enemyForward = enemyRoot.CFrame.LookVector  
 
 -- arah dari killer ke kita  
@@ -1851,7 +1870,7 @@ end
 
 
 local function createMoonwalkButton()
-    -- âœ… FIX: ADD NULL CHECK
+    -- FIX: ADD NULL CHECK
     if not PlayerGui or not PlayerGui.Parent then return end
     
     if MoonwalkButton then MoonwalkButton:Destroy() end
@@ -1861,7 +1880,7 @@ local function createMoonwalkButton()
     gui.ResetOnSpawn = false
     gui.Parent = PlayerGui
 
-    -- ðŸ”¥ CONTAINER BUTTON
+    -- CONTAINER BUTTON
     local btn = Instance.new("ImageButton")
     btn.Size = UDim2.new(0, 50, 0, 50)
     btn.Position = UDim2.new(0.65, 0, 0.75, 0)
@@ -1881,7 +1900,7 @@ local function createMoonwalkButton()
     corner.CornerRadius = UDim.new(1, 0)
     corner.Parent = btn
 
-    -- ðŸ”¥ OUTLINE DI BACKGROUND (INI YANG KAMU MAU)
+    -- OUTLINE DI BACKGROUND (INI YANG KAMU MAU)
     local stroke = Instance.new("UIStroke")
     stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border -- penting!
     stroke.Thickness = 1.2
@@ -2492,7 +2511,7 @@ local function drawCrosshair()
         return
     end
 
-    -- ðŸ”¥ DETECT STYLE CHANGE
+    -- DETECT STYLE CHANGE
     if LastCrosshairStyle ~= Crosshair.Style then
         clearCrosshair()
         created = false
@@ -2840,7 +2859,7 @@ local lastESPUpdate = 0
 local lastKillerUpdate = 0
 local lastGodMode = 0
 
--- âœ… HEARTBEAT: logika non-visual (tidak perlu sync frame)
+-- HEARTBEAT: logika non-visual (tidak perlu sync frame)
 RunService.Heartbeat:Connect(function()
     local now = tick()
 
@@ -2936,7 +2955,7 @@ RunService.Heartbeat:Connect(function()
     end
 end)
 
--- âœ… RENDERSTEP: hanya visual & camera (perlu sync frame)
+-- RENDERSTEP: hanya visual & camera (perlu sync frame)
 RunService.RenderStepped:Connect(function()
     local root = getRoot()
     if not root then return end
@@ -3040,7 +3059,7 @@ Enabled = false,
 Speed = 1.2,
 
 ReplaceMap = {
-["rbxassetid://83873880822918"]  = "rbxassetid://136962284480779"  -- Running â†’ Finesse
+["rbxassetid://83873880822918"]  = "rbxassetid://136962284480779"  -- Running -> Finesse
 }
 
 }
@@ -3133,7 +3152,7 @@ end
 InfoBox:AddLabel("Script: Freemium")
 InfoBox:AddLabel("Version: 2.0.0")
 InfoBox:AddLabel("Game: Violence District")
-InfoBox:AddLabel("Dev: â€¢à¼¶amillà¼¶â€¢")
+InfoBox:AddLabel("Dev: amill")
 InfoBox:AddLabel("Join discord for more info")
 InfoBox:AddLabel("Discord:")
 InfoBox:AddButton("Copy Discord Link", function()
@@ -3146,10 +3165,10 @@ end)
 
 -- CREDITS
 CreditsBox:AddLabel("Developer:")
-CreditsBox:AddLabel("â€¢ zryx vd")
+CreditsBox:AddLabel("- zryx vd")
 CreditsBox:AddDivider()
 CreditsBox:AddLabel("Library:")
-CreditsBox:AddLabel("â€¢ Obsidian UI")
+CreditsBox:AddLabel("- Obsidian UI")
 
 -- ================= ESP =================
 local SurvivorESP = ESPBox:AddCheckbox("SurvivorESP", {
