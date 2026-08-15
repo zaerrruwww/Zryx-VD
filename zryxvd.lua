@@ -2380,10 +2380,11 @@ RunService.RenderStepped:Connect(function()
                         targetFace = flatLook
                     end
 
-                    -- SMOOTH: interpolasi arah hadap supaya pergantian W/S halus
+                    -- SMOOTH: interpolasi arah hadap supaya pergantian W/S halus,
+                    -- tapi tetap cepat follow arah kamera
                     local targetYaw = math.atan2(targetFace.X, -targetFace.Z)
                     local delta = (targetYaw - MoonwalkSmoothYaw + math.pi) % (2 * math.pi) - math.pi
-                    MoonwalkSmoothYaw = MoonwalkSmoothYaw + delta * 0.15
+                    MoonwalkSmoothYaw = MoonwalkSmoothYaw + delta * 0.35
 
                     local baseCF = CFrame.new(hrp.Position) * CFrame.Angles(0, MoonwalkSmoothYaw, 0)
 
