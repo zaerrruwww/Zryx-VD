@@ -1,53 +1,8 @@
+﻿-- LOAD LIB
 local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
-
--- Xeno fix: game:HttpGet is broken in Xeno, use request/syn.request first
-local function Fetch(Url)
-    local requestFn = request or syn.request or http_request
-    if requestFn then
-        local ok, res = pcall(function()
-            return requestFn({ Url = Url })
-        end)
-        if ok and res and (res.StatusCode == 200 or res.StatusCode == 304) then
-            return res.Body or res.body
-        end
-    end
-    return game:HttpGet(Url)
-end
-
--- Replace Obsidian's internal game:HttpGet (broken on Xeno) with request-based fetch
-local function SafeHttpGet(Url)
-    local requestFn = request or syn.request or http_request
-    if requestFn then
-        local ok, res = pcall(function()
-            return requestFn({ Url = Url })
-        end)
-        if ok and res and (res.StatusCode == 200 or res.StatusCode == 304) then
-            return res.Body or res.body
-        end
-    end
-    return game:HttpGet(Url)
-end
-
-local genv = getgenv and getgenv() or _G
-genv.__SafeHttpGet = SafeHttpGet
-
-local function TryLoad(Url, Retries)
-    Retries = Retries or 3
-    for i = 1, Retries do
-        local ok, result = pcall(function()
-            local source = Fetch(Url)
-            source = source:gsub("game:HttpGet", "__SafeHttpGet")
-            return loadstring(source)()
-        end)
-        if ok and result then return result end
-        task.wait(0.5)
-    end
-    error("Gagal memuat: " .. Url)
-end
-
-local Library = TryLoad(repo .. "Library.lua")
-local ThemeManager = TryLoad(repo .. "addons/ThemeManager.lua")
-local SaveManager = TryLoad(repo .. "addons/SaveManager.lua")
+local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
+local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
+local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
 -- =======================================
 Library.Scheme.AccentColor     = Color3.fromRGB(90, 120, 210)
 Library.Scheme.BackgroundColor = Color3.fromRGB(15, 15, 20)
@@ -55,43 +10,7 @@ Library.Scheme.MainColor       = Color3.fromRGB(55, 60, 80)
 Library.Scheme.OutlineColor    = Color3.fromRGB(70, 85, 130)
 Library.Scheme.FontColor       = Color3.fromRGB(200, 215, 255)
 -- =======================================
--- COMPATIBILITY MODE (XENO)
-local CompatibilityMode = false
-
-local function detectXeno()
-    local ok, name = pcall(function()
-        return getexecutorname and getexecutorname() or ""
-    end)
-    if ok and type(name) == "string" and name:lower():find("xeno", 1, true) then
-        return true
-    end
-    local genv = getgenv and getgenv() or shared
-    if genv and genv.Xeno then
-        return true
-    end
-    return false
-end
-
-CompatibilityMode = detectXeno()
-
-if CompatibilityMode then
-    task.defer(function()
-        if Library and Library.Notify then
-            Library:Notify({
-                Title = "Compatibility Mode",
-                Text = "Network hooks disabled for Xeno compatibility",
-                Duration = 5
-            })
-        end
-    end)
-end
-
-local function NetworkFire(Remote, ...)
-    if CompatibilityMode then return end
-    Remote:FireServer(...)
-end
--- =======================================
--- ZRYX VD TOGGLE MENU
+-- FALLENS TOGGLE MENU
 local function CreateZryxVdToggleMenu(IconId)
 
     local ScreenGui = Instance.new("ScreenGui")
@@ -920,7 +839,7 @@ end
 local function UpdateGenerator(generator)
 if not generator or not generator.Parent then return end
 
--- kalau ESP mati -> hapus
+-- kalau ESP mati â†’ hapus
 if not ESP.Generator then
 local old = generator:FindFirstChild("GenESP")
 if old then old:Destroy() end
@@ -1040,7 +959,7 @@ end
 local text = ""
 
 if isDown then
-text = "v DOWN\n"
+text = "ðŸ”» DOWN\n"
 end
 
 if ESPStatus.ShowName then
@@ -1235,9 +1154,9 @@ local function AutoWiggle()
     local event = carry:FindFirstChild("SelfUnHookEvent")
     if not event then return end
 
-    -- spam wiggle
+    -- ðŸ”¥ spam wiggle
     for i = 1, Auto.WiggleSpam do
-        NetworkFire(event)
+        event:FireServer()
     end
 end
 
@@ -1350,7 +1269,7 @@ local function pressParryButton()
             VirtualInputManager:SendTouchEvent(8823, 2, x, y)
         end
     else
-        -- PC -> klik kanan
+        -- PC â†’ klik kanan
         pressRightClick()
     end
 end
@@ -1362,14 +1281,14 @@ lastParry = now
 
 ParryActive = true  
 
--- STOP MOONWALK LANGSUNG  
+-- ðŸ”¥ STOP MOONWALK LANGSUNG  
 if Moonwalk.Enabled then  
     Moonwalk.Enabled = false  
 end  
 
 pressParryButton()  
 
--- tunggu lebih lama (biar anim selesai)  
+-- ðŸ”¥ tunggu lebih lama (biar anim selesai)  
 task.delay(0.3, function()  
     ParryActive = false  
 end)
@@ -1399,7 +1318,7 @@ local enemyRoot = targetChar:FindFirstChild("HumanoidRootPart")
 
 if not myRoot or not enemyRoot then return false end  
 
--- arah depan killer  
+-- ðŸ”¥ arah depan killer  
 local enemyForward = enemyRoot.CFrame.LookVector  
 
 -- arah dari killer ke kita  
@@ -1869,7 +1788,7 @@ end
 
 
 local function createMoonwalkButton()
-    -- FIX: ADD NULL CHECK
+    -- âœ… FIX: ADD NULL CHECK
     if not PlayerGui or not PlayerGui.Parent then return end
     
     if MoonwalkButton then MoonwalkButton:Destroy() end
@@ -1879,7 +1798,7 @@ local function createMoonwalkButton()
     gui.ResetOnSpawn = false
     gui.Parent = PlayerGui
 
-    -- CONTAINER BUTTON
+    -- ðŸ”¥ CONTAINER BUTTON
     local btn = Instance.new("ImageButton")
     btn.Size = UDim2.new(0, 50, 0, 50)
     btn.Position = UDim2.new(0.65, 0, 0.75, 0)
@@ -1899,7 +1818,7 @@ local function createMoonwalkButton()
     corner.CornerRadius = UDim.new(1, 0)
     corner.Parent = btn
 
-    -- OUTLINE DI BACKGROUND (INI YANG KAMU MAU)
+    -- ðŸ”¥ OUTLINE DI BACKGROUND (INI YANG KAMU MAU)
     local stroke = Instance.new("UIStroke")
     stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border -- penting!
     stroke.Thickness = 1.2
@@ -2069,7 +1988,7 @@ local function startAutoStalk()
 
         if stalkEvent then
             pcall(function()
-                NetworkFire(stalkEvent, target)
+                stalkEvent:FireServer(target)
             end)
         end
     end)
@@ -2510,7 +2429,7 @@ local function drawCrosshair()
         return
     end
 
-    -- DETECT STYLE CHANGE
+    -- ðŸ”¥ DETECT STYLE CHANGE
     if LastCrosshairStyle ~= Crosshair.Style then
         clearCrosshair()
         created = false
@@ -2784,7 +2703,7 @@ local EmoteRemote =
 
 local function playEmote(name)
     pcall(function()
-        NetworkFire(EmoteRemote, name)
+        EmoteRemote:FireServer(name)
     end)
 end
 
@@ -2858,7 +2777,7 @@ local lastESPUpdate = 0
 local lastKillerUpdate = 0
 local lastGodMode = 0
 
--- HEARTBEAT: logika non-visual (tidak perlu sync frame)
+-- âœ… HEARTBEAT: logika non-visual (tidak perlu sync frame)
 RunService.Heartbeat:Connect(function()
     local now = tick()
 
@@ -2876,7 +2795,7 @@ RunService.Heartbeat:Connect(function()
         -- AUTO ATTACK
         if Killer.AutoAttack then
             pcall(function()
-                NetworkFire(AttackEvent, false)
+                AttackEvent:FireServer(false)
             end)
         end
 
@@ -2892,7 +2811,7 @@ RunService.Heartbeat:Connect(function()
                     root.CFrame = tRoot.CFrame * CFrame.new(0, 3, -2)
                     task.wait(0.4)
                     for i = 1, 4 do
-                        NetworkFire(CarryEvent, target)
+                        CarryEvent:FireServer(target)
                         task.wait(0.2)
                     end
                     task.wait(0.6)
@@ -2901,7 +2820,7 @@ RunService.Heartbeat:Connect(function()
                         root.CFrame = hook.CFrame * CFrame.new(0, 4, -3)
                         task.wait(0.7)
                         for i = 1, 6 do
-                            NetworkFire(HookEvent, hook)
+                            HookEvent:FireServer(hook)
                             task.wait(0.15)
                         end
                     end
@@ -2930,7 +2849,7 @@ RunService.Heartbeat:Connect(function()
                         local behind = targetHRP.CFrame.LookVector * -3
                         root.CFrame = CFrame.new(targetPos + behind, targetPos)
                     end
-                    pcall(function() NetworkFire(AttackEvent, false) end)
+                    pcall(function() AttackEvent:FireServer(false) end)
                 end
             end
         end
@@ -2954,7 +2873,7 @@ RunService.Heartbeat:Connect(function()
     end
 end)
 
--- RENDERSTEP: hanya visual & camera (perlu sync frame)
+-- âœ… RENDERSTEP: hanya visual & camera (perlu sync frame)
 RunService.RenderStepped:Connect(function()
     local root = getRoot()
     if not root then return end
@@ -3058,7 +2977,7 @@ Enabled = false,
 Speed = 1.2,
 
 ReplaceMap = {
-["rbxassetid://83873880822918"]  = "rbxassetid://136962284480779"  -- Running -> Finesse
+["rbxassetid://83873880822918"]  = "rbxassetid://136962284480779"  -- Running â†’ Finesse
 }
 
 }
@@ -3151,7 +3070,7 @@ end
 InfoBox:AddLabel("Script: Freemium")
 InfoBox:AddLabel("Version: 2.0.0")
 InfoBox:AddLabel("Game: Violence District")
-InfoBox:AddLabel("Dev: amill")
+InfoBox:AddLabel("Dev: â€¢à¼¶amillà¼¶â€¢")
 InfoBox:AddLabel("Join discord for more info")
 InfoBox:AddLabel("Discord:")
 InfoBox:AddButton("Copy Discord Link", function()
@@ -3168,6 +3087,15 @@ CreditsBox:AddLabel("- zryx vd")
 CreditsBox:AddDivider()
 CreditsBox:AddLabel("Library:")
 CreditsBox:AddLabel("- Obsidian UI")
+CreditsBox:AddDivider()
+CreditsBox:AddLabel("Support the dev:")
+CreditsBox:AddButton("Copy Support Link", function()
+    setclipboard("https://sociabuzz.com/amill_al/tribe")
+    Library:Notify({
+        Title = "Thanks for the support!",
+        Duration = 3
+    })
+end)
 
 -- ================= ESP =================
 local SurvivorESP = ESPBox:AddCheckbox("SurvivorESP", {
@@ -3582,7 +3510,7 @@ KillerTab:AddButton("Activate Power", function()
         and ReplicatedStorage.Remotes.Killers.Masked:FindFirstChild("Activatepower")
     
     if Event then
-        NetworkFire(Event, Masked.CurrentPower)
+        Event:FireServer(Masked.CurrentPower)
     else
     end
 end)
@@ -3594,7 +3522,7 @@ KillerTab:AddButton("Deactivate Power", function()
         and ReplicatedStorage.Remotes.Killers.Masked:FindFirstChild("Deactivatepower")
     
     if Event then
-        NetworkFire(Event)
+        Event:FireServer()
     else
     end
 end)
