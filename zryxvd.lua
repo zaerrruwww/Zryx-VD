@@ -2447,6 +2447,17 @@ RunService.RenderStepped:Connect(function()
                     local baseCF = CFrame.new(hrp.Position, hrp.Position + flatLook)
                     local angle = math.sin(tick() * Moonwalk.SpamSpeed) * Moonwalk.Intensity
                     hrp.CFrame = baseCF * CFrame.Angles(0, math.rad(angle), 0)
+
+                    local move = Vector3.new(0, 0, 0)
+                    if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+                        move = move + Vector3.new(0, 0, 1)
+                    end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+                        move = move + Vector3.new(0, 0, -1)
+                    end
+                    if move.Magnitude > 0 then
+                        humanoid:Move(move, true)
+                    end
                 end
             end
         end
