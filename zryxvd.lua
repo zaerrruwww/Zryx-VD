@@ -2381,15 +2381,10 @@ RunService.RenderStepped:Connect(function()
                         else
                             faceDir = flatLook
                         end
-                    else
-                        faceDir = flatLook
-                    end
 
-                    local baseCF = CFrame.new(hrp.Position, hrp.Position + faceDir)
-                    local angle = math.sin(tick() * Moonwalk.SpamSpeed) * Moonwalk.Intensity
-                    hrp.CFrame = baseCF * CFrame.Angles(0, math.rad(angle), 0)
-
-                    if move then
+                        local baseCF = CFrame.new(hrp.Position, hrp.Position + faceDir)
+                        local angle = math.sin(tick() * Moonwalk.SpamSpeed) * Moonwalk.Intensity
+                        hrp.CFrame = baseCF * CFrame.Angles(0, math.rad(angle), 0)
                         humanoid:Move(move, false)
                     end
                 end
@@ -2995,6 +2990,15 @@ MovementBox:Toggle({
     Value = false,
     Callback = function(v)
         Moonwalk.Enabled = v
+    end
+})
+
+MovementBox:Keybind({
+    Flag = "MoonwalkKey",
+    Title = "Moonwalk Keybind",
+    Value = Enum.KeyCode.V,
+    Callback = function()
+        Moonwalk.Enabled = not Moonwalk.Enabled
     end
 })
 
