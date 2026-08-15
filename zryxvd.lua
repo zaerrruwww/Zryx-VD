@@ -2366,23 +2366,18 @@ RunService.RenderStepped:Connect(function()
                 if flatLook.Magnitude > 0 then
                     flatLook = flatLook.Unit
 
-                    local move = nil
-                    if UserInputService:IsKeyDown(Enum.KeyCode.W) then
-                        move = flatLook
-                    elseif UserInputService:IsKeyDown(Enum.KeyCode.S) then
-                        move = -flatLook
-                    end
-
                     -- REVERSE MOONWALK: badan menghadap lawan arah gerak
                     -- maju (W) -> badan menghadap mundur, tetap meluncur ke depan
                     -- mundur (S) -> badan menghadap depan, tetap meluncur ke belakang
+                    -- Gerak pakai relatif kamera supaya selalu meluncur mulus
+                    local moveCamera = nil
                     local targetFace = flatLook
-                    if move then
-                        if move == flatLook then
-                            targetFace = -flatLook
-                        else
-                            targetFace = flatLook
-                        end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+                        moveCamera = Vector3.new(0, 0, 1)
+                        targetFace = -flatLook
+                    elseif UserInputService:IsKeyDown(Enum.KeyCode.S) then
+                        moveCamera = Vector3.new(0, 0, -1)
+                        targetFace = flatLook
                     end
 
                     -- SMOOTH: interpolasi arah hadap supaya pergantian W/S halus
@@ -2392,10 +2387,10 @@ RunService.RenderStepped:Connect(function()
 
                     local baseCF = CFrame.new(hrp.Position) * CFrame.Angles(0, MoonwalkSmoothYaw, 0)
 
-                    if move then
+                    if moveCamera then
                         local angle = math.sin(tick() * Moonwalk.SpamSpeed) * Moonwalk.Intensity
                         hrp.CFrame = baseCF * CFrame.Angles(0, math.rad(angle), 0)
-                        humanoid:Move(move, false)
+                        humanoid:Move(moveCamera, true)
                     else
                         hrp.CFrame = baseCF
                     end
