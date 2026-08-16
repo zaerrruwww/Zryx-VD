@@ -114,24 +114,11 @@ Window:SetUIScale(IsMobile and 1 or 0.85)
 --   menu buka  -> dipaksa bebas (Default)
 --   menu tutup + hidup (round/game) -> kunci (LockCenter) biar FPS
 --   menu tutup + mati/spec atau di lobby -> bebas (biarin game atur sendiri)
--- Deteksi menu: polling Window.UIElements.Main.Main.Visible tiap frame
--- (frame dalam WindUI yg beneran disembunyikan saat close) + callback cadangan.
+-- Deteksi: bungkus method Open/Close asli WindUI (pasti akurat, semua
+-- buka/tutup lewat method ini). Polling Visible/Closed gagal karena
+-- frame luar tetap Visible saat close.
 if not IsMobile then
     local menuOpen = false
-
-    local function isMenuVisible()
-        local ok, visible = pcall(function()
-            return Window.UIElements.Main.Main.Visible
-        end)
-        if ok and typeof(visible) == "boolean" then
-            return visible
-        end
-        local ok2, closed = pcall(function() return Window.Closed end)
-        if ok2 and typeof(closed) == "boolean" then
-            return closed == false
-        end
-        return menuOpen
-    end
 
     local function isInGame()
         local char = LocalPlayer.Character
@@ -142,7 +129,7 @@ if not IsMobile then
     end
 
     local function applyMouse()
-        if isMenuVisible() then
+        if menuOpen then
             UserInputService.MouseBehavior = Enum.MouseBehavior.Default
             UserInputService.MouseIconEnabled = true
         elseif isInGame() then
@@ -151,12 +138,34 @@ if not IsMobile then
         end
     end
 
-    pcall(function()
-        if Window.OnOpen then Window:OnOpen(function() menuOpen = true applyMouse() end) end
-        if Window.OnClose then Window:OnClose(function() menuOpen = false applyMouse() end) end
+    -- bungkus Open/Close asli (Toggle otomatis ikut karena panggil method ini)
+    local oldOpen = Window.Open
+    local oldClose = Window.Close
+    if oldOpen then
+        Window.Open = function(self, ...)
+            local r = oldOpen(self, ...)
+            menuOpen = true
+            applyMouse()
+            return r
+        end
+    end
+    if oldClose then
+        Window.Close = function(self, ...)
+            local r = oldClose(self, ...)
+            menuOpen = false
+            applyMouse()
+            return r
+        end
+    end
+
+    -- inisialisasi: menu start terbuka (CreateWindow manggil Open saat init)
+    task.spawn(function()
+        task.wait(0.3)
+        menuOpen = true
+        applyMouse()
     end)
 
-    -- dipaksa tiap frame (RenderStep + Heartbeat biar ngalahin game)
+    -- jaga-jaga tiap frame (biar ngalahin game yg set cursor terus)
     RunService:BindToRenderStep("ZryxMouseFree", Enum.RenderPriority.Last.Value, applyMouse)
     RunService.Heartbeat:Connect(applyMouse)
 end
