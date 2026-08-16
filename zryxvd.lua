@@ -2330,7 +2330,7 @@ RunService.RenderStepped:Connect(function(dt)
         updateParryCircle()
     end
 
-    -- CROSSHAIR & MOONWALK: tetap setiap frame (butuh smooth)
+    -- CROSSHAIR & FOV CIRCLE: tetap setiap frame (butuh smooth)
     drawFOVCircle()
     drawCrosshair()
 end)
