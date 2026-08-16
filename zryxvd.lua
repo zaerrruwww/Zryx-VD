@@ -111,19 +111,28 @@ local RunService = game:GetService("RunService")
 Window:SetUIScale(IsMobile and 1 or 0.85)
 
 -- === MOUSE LOCK (seperti tekan Esc) ===
--- Buka menu -> kursor bebas, tutup menu -> kursor kunci ke tengah (gameplay FPS)
+-- Buka menu -> kursor bebas & kamera beku, tutup menu -> kursor kunci ke tengah (gameplay FPS)
 local lastToggled = WindUI.Toggled
+local frozenCamera = nil
 RunService:BindToRenderStep("ZryxMouseLock", Enum.RenderPriority.Last.Value, function()
     if IsMobile then return end
+    local cam = workspace.CurrentCamera
     if WindUI.Toggled then
         if UserInputService.MouseBehavior ~= Enum.MouseBehavior.Default then
             UserInputService.MouseBehavior = Enum.MouseBehavior.Default
         end
         UserInputService.MouseIconEnabled = true
+        if cam then
+            if not frozenCamera then
+                frozenCamera = cam.CFrame
+            end
+            cam.CFrame = frozenCamera
+        end
     else
         if lastToggled then
             UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
             UserInputService.MouseIconEnabled = false
+            frozenCamera = nil
         end
     end
     lastToggled = WindUI.Toggled
