@@ -2370,13 +2370,15 @@ RunService.RenderStepped:Connect(function(dt)
                     -- REVERSE MOONWALK: badan menghadap lawan arah gerak
                     -- maju (W) -> badan menghadap mundur, tetap meluncur ke depan
                     -- mundur (S) -> badan menghadap depan, tetap meluncur ke belakang
-                    local moveDir = nil
+                    -- Gerak pakai humanoid:Move (relatif kamera) = halus & tetap animasi,
+                    -- rotasi badan dikontrol manual via CFrame.
+                    local moveCam = nil
                     local targetFace = flatLook
                     if UserInputService:IsKeyDown(Enum.KeyCode.W) then
-                        moveDir = flatLook
+                        moveCam = Vector3.new(0, 0, 1)
                         targetFace = -flatLook
                     elseif UserInputService:IsKeyDown(Enum.KeyCode.S) then
-                        moveDir = -flatLook
+                        moveCam = Vector3.new(0, 0, -1)
                         targetFace = flatLook
                     end
 
@@ -2386,16 +2388,12 @@ RunService.RenderStepped:Connect(function(dt)
                     local delta = (targetYaw - MoonwalkSmoothYaw + math.pi) % (2 * math.pi) - math.pi
                     MoonwalkSmoothYaw = MoonwalkSmoothYaw + delta * 0.35
 
-                    local newPos = hrp.Position
-                    if moveDir then
-                        newPos = hrp.Position + moveDir * (Moonwalk.SlowSpeed * (dt or 1 / 60))
-                    end
+                    local baseCF = CFrame.new(hrp.Position) * CFrame.Angles(0, MoonwalkSmoothYaw, 0)
 
-                    local baseCF = CFrame.new(newPos) * CFrame.Angles(0, MoonwalkSmoothYaw, 0)
-
-                    if moveDir then
+                    if moveCam then
                         local angle = math.sin(tick() * Moonwalk.SpamSpeed) * Moonwalk.Intensity
                         hrp.CFrame = baseCF * CFrame.Angles(0, math.rad(angle), 0)
+                        humanoid:Move(moveCam, true)
                     else
                         hrp.CFrame = baseCF
                     end
