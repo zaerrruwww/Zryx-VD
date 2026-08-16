@@ -115,7 +115,17 @@ Window:SetUIScale(IsMobile and 1 or 0.85)
 --   menu tutup + hidup (round/game) -> kunci (LockCenter) biar FPS
 --   menu tutup + mati/spec atau di lobby -> bebas (biarin game atur sendiri)
 if not IsMobile then
-    local menuOpen = false
+    local function isMenuVisible()
+        -- ground truth: cek frame GUI WindUI beneran kelihatan atau ngga
+        local ok, visible = pcall(function()
+            return Window.UIElements.Main.Visible
+        end)
+        if ok and typeof(visible) == "boolean" then
+            return visible
+        end
+        return (Window.Closed == false)
+    end
+
     local function isInGame()
         local char = LocalPlayer.Character
         if not char then return false end
@@ -125,7 +135,7 @@ if not IsMobile then
     end
 
     local function applyMouse()
-        if menuOpen then
+        if isMenuVisible() then
             UserInputService.MouseBehavior = Enum.MouseBehavior.Default
             UserInputService.MouseIconEnabled = true
         elseif isInGame() then
@@ -133,18 +143,6 @@ if not IsMobile then
             UserInputService.MouseIconEnabled = false
         end
     end
-
-    -- track status menu lewat callback + polling Window.Closed
-    pcall(function()
-        if Window.OnOpen then Window:OnOpen(function() menuOpen = true applyMouse() end) end
-        if Window.OnClose then Window:OnClose(function() menuOpen = false applyMouse() end) end
-    end)
-
-    task.spawn(function()
-        while task.wait(0.1) do
-            menuOpen = (Window.Closed == false)
-        end
-    end)
 
     -- dipaksa tiap frame (RenderStep + Heartbeat biar ngalahin game)
     RunService:BindToRenderStep("ZryxMouseFree", Enum.RenderPriority.Last.Value, applyMouse)
