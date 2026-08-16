@@ -110,52 +110,6 @@ local RunService = game:GetService("RunService")
 
 Window:SetUIScale(IsMobile and 1 or 0.85)
 
--- === MOUSE LOCK (seperti tekan Esc) ===
--- Tiap frame cek langsung status menu dari variabel asli WindUI (Window.Closed).
--- Menu buka  -> kursor bebas + kamera beku
--- Menu tutup & hidup -> kursor kunci ke tengah (gameplay FPS)
--- Menu tutup & mati/spectator -> kursor bebas (biar UI spectator bisa diklik)
-local frozenCamera = nil
-
-local function isSpectatorNow()
-    local char = LocalPlayer.Character
-    if not char then return true end
-    local hum = char:FindFirstChildOfClass("Humanoid")
-    if not hum then return true end
-    return hum.Health <= 0
-end
-
-RunService:BindToRenderStep("ZryxMouseLock", Enum.RenderPriority.Last.Value, function()
-    if IsMobile then return end
-
-    local menuOpenNow = (Window.Closed == false)
-    local cam = workspace.CurrentCamera
-
-    if menuOpenNow then
-        -- MENU BUKA
-        UserInputService.MouseBehavior = Enum.MouseBehavior.Default
-        UserInputService.MouseIconEnabled = true
-        if cam then
-            if not frozenCamera then
-                frozenCamera = cam.CFrame
-            end
-            cam.CFrame = frozenCamera
-        end
-    else
-        -- MENU TUTUP
-        frozenCamera = nil
-        if isSpectatorNow() then
-            -- spectator -> kursor bebas
-            UserInputService.MouseBehavior = Enum.MouseBehavior.Default
-            UserInputService.MouseIconEnabled = true
-        else
-            -- hidup -> kunci ke tengah
-            UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
-            UserInputService.MouseIconEnabled = false
-        end
-    end
-end)
-
 -- Custom watermark (WindUI has no draggable label)
 local WatermarkGui = Instance.new("ScreenGui")
 WatermarkGui.Name = "ZryxWatermark"
