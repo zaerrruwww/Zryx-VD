@@ -114,10 +114,16 @@ Window:SetUIScale(IsMobile and 1 or 0.85)
 --   menu buka  -> dipaksa bebas (Default)
 --   menu tutup + hidup (round/game) -> kunci (LockCenter) biar FPS
 --   menu tutup + mati/spec atau di lobby -> bebas (biarin game atur sendiri)
--- Deteksi menu pakai callback OnOpen/OnClose WindUI (paling akurat),
--- BUKAN polling Window.Closed / Visible (terbukti nggak konsisten).
+-- Deteksi menu: polling Window.Closed tiap frame (utama) + callback (cadangan)
 if not IsMobile then
     local menuOpen = false
+
+    local function updateMenuState()
+        local ok, closed = pcall(function() return Window.Closed end)
+        if ok and typeof(closed) == "boolean" then
+            menuOpen = (closed == false)
+        end
+    end
 
     local function isInGame()
         local char = LocalPlayer.Character
@@ -142,16 +148,15 @@ if not IsMobile then
         if Window.OnClose then Window:OnClose(function() menuOpen = false applyMouse() end) end
     end)
 
-    -- inisialisasi status awal dari callback window (menu start terbuka)
-    task.spawn(function()
-        task.wait(0.5)
-        menuOpen = (Window.Closed == false)
+    -- dipaksa tiap frame (RenderStep + Heartbeat biar ngalahin game)
+    RunService:BindToRenderStep("ZryxMouseFree", Enum.RenderPriority.Last.Value, function()
+        updateMenuState()
         applyMouse()
     end)
-
-    -- dipaksa tiap frame (RenderStep + Heartbeat biar ngalahin game)
-    RunService:BindToRenderStep("ZryxMouseFree", Enum.RenderPriority.Last.Value, applyMouse)
-    RunService.Heartbeat:Connect(applyMouse)
+    RunService.Heartbeat:Connect(function()
+        updateMenuState()
+        applyMouse()
+    end)
 end
 
 -- Custom watermark (WindUI has no draggable label)
