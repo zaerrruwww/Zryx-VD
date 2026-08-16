@@ -293,8 +293,8 @@ local MaskedPowers = {"Cobra", "Richter", "Brandon", "Rabbit", "Alex"}
 
 local Moonwalk = {
 Enabled = false,
-SpamSpeed = 30,
-Intensity = 35,
+SpamSpeed = 20,
+Intensity = 8,
 SlowSpeed = 13,
 UseSlow = true
 }
