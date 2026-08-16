@@ -272,7 +272,8 @@ local GunAim = {
     VisibilityCheck = true,
     Target = nil,
     AimPart = "HumanoidRootPart",
-    ShowFOVCircle = false
+    ShowFOVCircle = false,
+    MobileButton = false
 }
 
 local Killer = {
@@ -1497,6 +1498,97 @@ task.spawn(function()
         end
     end
 end)
+
+-- ====== MOBILE AIMLOCK FLOATING BUTTON ======
+local MobileAimButtonGui = nil
+local MobileAimButtonConnections = {}
+
+local function createMobileAimButton()
+    removeMobileAimButton()
+
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "ZryxMobileAimButton"
+    gui.ResetOnSpawn = false
+    gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    gui.DisplayOrder = 999
+    gui.Parent = PlayerGui
+
+    local holder = Instance.new("Frame")
+    holder.Name = "Holder"
+    holder.AnchorPoint = Vector2.new(0.5, 0.5)
+    holder.Size = UDim2.fromOffset(90, 90)
+    holder.Position = UDim2.new(0.85, 0, 0.5, 0)
+    holder.BackgroundTransparency = 1
+    holder.Parent = gui
+
+    local btn = Instance.new("TextButton")
+    btn.Name = "AimButton"
+    btn.Size = UDim2.fromScale(1, 1)
+    btn.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+    btn.BackgroundTransparency = 0.15
+    btn.BorderSizePixel = 0
+    btn.Text = "AIM"
+    btn.TextColor3 = Color3.fromRGB(255, 120, 60)
+    btn.TextSize = 18
+    btn.Font = Enum.Font.GothamBold
+    btn.AutoButtonColor = false
+    btn.Parent = holder
+
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Color3.fromRGB(255, 120, 60)
+    stroke.Thickness = 2
+    stroke.Parent = btn
+
+    local radius = Instance.new("UICorner")
+    radius.CornerRadius = UDim.new(1, 0)
+    radius.Parent = btn
+
+    local dragConn = nil
+    local dragStart, dragHold = nil, nil
+
+    btn.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch then
+            GunAim.Holding = true
+            btn.BackgroundColor3 = Color3.fromRGB(255, 120, 60)
+            btn.TextColor3 = Color3.fromRGB(30, 30, 35)
+            dragStart = input.Position
+            dragHold = holder.Position
+        end
+    end)
+
+    btn.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch then
+            GunAim.Holding = false
+            btn.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+            btn.TextColor3 = Color3.fromRGB(255, 120, 60)
+            dragStart, dragHold = nil, nil
+        end
+    end)
+
+    dragConn = UserInputService.InputChanged:Connect(function(input)
+        if input.UserInputType ~= Enum.UserInputType.Touch then return end
+        if not dragStart or not dragHold then return end
+        local delta = input.Position - dragStart
+        holder.Position = UDim2.new(
+            dragHold.X.Scale, dragHold.X.Offset + delta.X,
+            dragHold.Y.Scale, dragHold.Y.Offset + delta.Y
+        )
+    end)
+
+    MobileAimButtonConnections = { dragConn }
+    MobileAimButtonGui = gui
+end
+
+local function removeMobileAimButton()
+    for _, c in ipairs(MobileAimButtonConnections) do
+        pcall(function() c:Disconnect() end)
+    end
+    MobileAimButtonConnections = {}
+    if MobileAimButtonGui then
+        pcall(function() MobileAimButtonGui:Destroy() end)
+        MobileAimButtonGui = nil
+    end
+end
 
 local function isDowned()
 local char = LocalPlayer.Character
@@ -2823,6 +2915,20 @@ AimlockBox:Toggle({
     Value = false,
     Callback = function(v)
         GunAim.Enabled = v
+    end
+})
+
+AimlockBox:Toggle({
+    Flag = "GunAimMobileButton",
+    Title = "Mobile Aim Button",
+    Value = false,
+    Callback = function(v)
+        GunAim.MobileButton = v
+        if v then
+            createMobileAimButton()
+        else
+            removeMobileAimButton()
+        end
     end
 })
 
