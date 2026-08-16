@@ -110,16 +110,24 @@ local RunService = game:GetService("RunService")
 
 Window:SetUIScale(IsMobile and 1 or 0.85)
 
--- === KURSOR: BEBAS SAAT MENU BUKA, LOCK SAAT MENU TUTUP ===
--- Game FPS ngunci kursor (LockCenter) tiap frame pas gameplay, jadi:
+-- === KURSOR ===
 --   menu buka  -> dipaksa bebas (Default)
---   menu tutup -> dipaksa kunci (LockCenter) biar balik ke mode FPS
+--   menu tutup + hidup (round/game) -> kunci (LockCenter) biar FPS
+--   menu tutup + mati/spec atau di lobby -> bebas (biarin game atur sendiri)
 if not IsMobile then
+    local function isInGame()
+        local char = LocalPlayer.Character
+        if not char then return false end
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if not hum then return false end
+        return hum.Health > 0
+    end
+
     RunService:BindToRenderStep("ZryxMouseFree", Enum.RenderPriority.Last.Value, function()
         if Window.Closed == false then
             UserInputService.MouseBehavior = Enum.MouseBehavior.Default
             UserInputService.MouseIconEnabled = true
-        else
+        elseif isInGame() then
             UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
             UserInputService.MouseIconEnabled = false
         end
