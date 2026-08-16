@@ -114,15 +114,23 @@ Window:SetUIScale(IsMobile and 1 or 0.85)
 --   menu buka  -> dipaksa bebas (Default)
 --   menu tutup + hidup (round/game) -> kunci (LockCenter) biar FPS
 --   menu tutup + mati/spec atau di lobby -> bebas (biarin game atur sendiri)
--- Deteksi menu: polling Window.Closed tiap frame (utama) + callback (cadangan)
+-- Deteksi menu: polling Window.UIElements.Main.Main.Visible tiap frame
+-- (frame dalam WindUI yg beneran disembunyikan saat close) + callback cadangan.
 if not IsMobile then
     local menuOpen = false
 
-    local function updateMenuState()
-        local ok, closed = pcall(function() return Window.Closed end)
-        if ok and typeof(closed) == "boolean" then
-            menuOpen = (closed == false)
+    local function isMenuVisible()
+        local ok, visible = pcall(function()
+            return Window.UIElements.Main.Main.Visible
+        end)
+        if ok and typeof(visible) == "boolean" then
+            return visible
         end
+        local ok2, closed = pcall(function() return Window.Closed end)
+        if ok2 and typeof(closed) == "boolean" then
+            return closed == false
+        end
+        return menuOpen
     end
 
     local function isInGame()
@@ -134,7 +142,7 @@ if not IsMobile then
     end
 
     local function applyMouse()
-        if menuOpen then
+        if isMenuVisible() then
             UserInputService.MouseBehavior = Enum.MouseBehavior.Default
             UserInputService.MouseIconEnabled = true
         elseif isInGame() then
@@ -149,14 +157,8 @@ if not IsMobile then
     end)
 
     -- dipaksa tiap frame (RenderStep + Heartbeat biar ngalahin game)
-    RunService:BindToRenderStep("ZryxMouseFree", Enum.RenderPriority.Last.Value, function()
-        updateMenuState()
-        applyMouse()
-    end)
-    RunService.Heartbeat:Connect(function()
-        updateMenuState()
-        applyMouse()
-    end)
+    RunService:BindToRenderStep("ZryxMouseFree", Enum.RenderPriority.Last.Value, applyMouse)
+    RunService.Heartbeat:Connect(applyMouse)
 end
 
 -- Custom watermark (WindUI has no draggable label)
