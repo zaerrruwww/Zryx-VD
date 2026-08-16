@@ -110,14 +110,18 @@ local RunService = game:GetService("RunService")
 
 Window:SetUIScale(IsMobile and 1 or 0.85)
 
--- === KURSOR BEBAS SAAT MENU BUKA ===
--- Game FPS ngunci kursor (LockCenter) tiap frame, jadi kursor wajib dipaksa bebas
--- selagi menu kebuka. Nggak ada freeze kamera.
+-- === KURSOR: BEBAS SAAT MENU BUKA, LOCK SAAT MENU TUTUP ===
+-- Game FPS ngunci kursor (LockCenter) tiap frame pas gameplay, jadi:
+--   menu buka  -> dipaksa bebas (Default)
+--   menu tutup -> dipaksa kunci (LockCenter) biar balik ke mode FPS
 if not IsMobile then
     RunService:BindToRenderStep("ZryxMouseFree", Enum.RenderPriority.Last.Value, function()
         if Window.Closed == false then
             UserInputService.MouseBehavior = Enum.MouseBehavior.Default
             UserInputService.MouseIconEnabled = true
+        else
+            UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
+            UserInputService.MouseIconEnabled = false
         end
     end)
 end
