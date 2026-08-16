@@ -110,6 +110,25 @@ local RunService = game:GetService("RunService")
 
 Window:SetUIScale(IsMobile and 1 or 0.85)
 
+-- === MOUSE LOCK (seperti tekan Esc) ===
+-- Buka menu -> kursor bebas, tutup menu -> kursor kunci ke tengah (gameplay FPS)
+local lastToggled = WindUI.Toggled
+RunService:BindToRenderStep("ZryxMouseLock", Enum.RenderPriority.Last.Value, function()
+    if IsMobile then return end
+    if WindUI.Toggled then
+        if UserInputService.MouseBehavior ~= Enum.MouseBehavior.Default then
+            UserInputService.MouseBehavior = Enum.MouseBehavior.Default
+        end
+        UserInputService.MouseIconEnabled = true
+    else
+        if lastToggled then
+            UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
+            UserInputService.MouseIconEnabled = false
+        end
+    end
+    lastToggled = WindUI.Toggled
+end)
+
 -- Custom watermark (WindUI has no draggable label)
 local WatermarkGui = Instance.new("ScreenGui")
 WatermarkGui.Name = "ZryxWatermark"
