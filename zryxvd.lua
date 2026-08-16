@@ -110,6 +110,18 @@ local RunService = game:GetService("RunService")
 
 Window:SetUIScale(IsMobile and 1 or 0.85)
 
+-- === KURSOR BEBAS SAAT MENU BUKA ===
+-- Game FPS ngunci kursor (LockCenter) tiap frame, jadi kursor wajib dipaksa bebas
+-- selagi menu kebuka. Nggak ada freeze kamera.
+if not IsMobile then
+    RunService:BindToRenderStep("ZryxMouseFree", Enum.RenderPriority.Last.Value, function()
+        if Window.Closed == false then
+            UserInputService.MouseBehavior = Enum.MouseBehavior.Default
+            UserInputService.MouseIconEnabled = true
+        end
+    end)
+end
+
 -- Custom watermark (WindUI has no draggable label)
 local WatermarkGui = Instance.new("ScreenGui")
 WatermarkGui.Name = "ZryxWatermark"
