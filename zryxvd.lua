@@ -291,16 +291,6 @@ local Masked = {
 
 local MaskedPowers = {"Cobra", "Richter", "Brandon", "Rabbit", "Alex"}
 
-local Moonwalk = {
-Enabled = false,
-SpamSpeed = 20,
-Intensity = 8,
-SlowSpeed = 13,
-UseSlow = true
-}
-
-local MoonwalkSmoothYaw = 0
-
 local CameraZoom = {
     UnlimitedZoom = false,
     MaxDistance = 1000,
@@ -1148,11 +1138,6 @@ if now - lastParry < PARRY_DEBOUNCE then return end
 lastParry = now
 
 ParryActive = true  
-
--- ðŸ”¥ STOP MOONWALK LANGSUNG  
-if Moonwalk.Enabled then  
-    Moonwalk.Enabled = false  
-end  
 
 pressParryButton()  
 
@@ -2348,67 +2333,6 @@ RunService.RenderStepped:Connect(function(dt)
     -- CROSSHAIR & MOONWALK: tetap setiap frame (butuh smooth)
     drawFOVCircle()
     drawCrosshair()
-
-    if Moonwalk.Enabled and not ParryActive and not isDowned() then
-        local char = LocalPlayer.Character
-        if char and char.Parent then
-            local humanoid = char:FindFirstChildOfClass("Humanoid")
-            local hrp = char:FindFirstChild("HumanoidRootPart")
-            local cam = workspace.CurrentCamera
-
-            if humanoid and hrp and cam then
-                humanoid.AutoRotate = false
-                if Moonwalk.UseSlow and humanoid.WalkSpeed ~= Moonwalk.SlowSpeed then
-                    humanoid.WalkSpeed = Moonwalk.SlowSpeed
-                end
-
-                local look = cam.CFrame.LookVector
-                local flatLook = Vector3.new(look.X, 0, look.Z)
-                if flatLook.Magnitude > 0 then
-                    flatLook = flatLook.Unit
-
-                    -- REVERSE MOONWALK: badan menghadap lawan arah gerak
-                    -- maju (W) -> badan menghadap mundur, tetap meluncur ke depan
-                    -- mundur (S) -> badan menghadap depan, tetap meluncur ke belakang
-                    -- Gerak pakai humanoid:Move (relatif kamera) = halus & tetap animasi,
-                    -- rotasi badan dikontrol manual via CFrame.
-                    local moveCam = nil
-                    local targetFace = flatLook
-                    if UserInputService:IsKeyDown(Enum.KeyCode.W) then
-                        moveCam = Vector3.new(0, 0, 1)
-                        targetFace = -flatLook
-                    elseif UserInputService:IsKeyDown(Enum.KeyCode.S) then
-                        moveCam = Vector3.new(0, 0, -1)
-                        targetFace = flatLook
-                    end
-
-                    -- SMOOTH: interpolasi arah hadap supaya pergantian W/S halus,
-                    -- tapi tetap cepat follow arah kamera
-                    local targetYaw = math.atan2(targetFace.X, -targetFace.Z)
-                    local delta = (targetYaw - MoonwalkSmoothYaw + math.pi) % (2 * math.pi) - math.pi
-                    MoonwalkSmoothYaw = MoonwalkSmoothYaw + delta * 0.35
-
-                    local baseCF = CFrame.new(hrp.Position) * CFrame.Angles(0, MoonwalkSmoothYaw, 0)
-
-                    if moveCam then
-                        local angle = math.sin(tick() * Moonwalk.SpamSpeed) * Moonwalk.Intensity
-                        hrp.CFrame = baseCF * CFrame.Angles(0, math.rad(angle), 0)
-                        humanoid:Move(moveCam, true)
-                    else
-                        hrp.CFrame = baseCF
-                    end
-                end
-            end
-        end
-    else
-        local char = LocalPlayer.Character
-        if char then
-            local humanoid = char:FindFirstChildOfClass("Humanoid")
-            if humanoid then
-                humanoid.AutoRotate = true
-            end
-        end
-    end
 end)
 
 RunService.RenderStepped:Connect(function()
@@ -2999,24 +2923,6 @@ MovementBox:Toggle({
     Value = false,
     Callback = function(v)
         toggleNoClip(v)
-    end
-})
-
-MovementBox:Toggle({
-    Flag = "BasicMoonwalk",
-    Title = "Basic Moonwalk",
-    Value = false,
-    Callback = function(v)
-        Moonwalk.Enabled = v
-    end
-})
-
-MovementBox:Keybind({
-    Flag = "MoonwalkKey",
-    Title = "Moonwalk Keybind",
-    Value = Enum.KeyCode.V,
-    Callback = function()
-        Moonwalk.Enabled = not Moonwalk.Enabled
     end
 })
 

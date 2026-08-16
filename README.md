@@ -39,8 +39,7 @@ Advanced Lua script for **Roblox Violence District** featuring Aimbot, Aimlock, 
 
 - **Movement**  
   - WalkSpeed override with smart disabling during animations  
-  - No Clip toggle  
-  - Moonwalk sway (no forward/backward movement) with keybind, spam speed and intensity
+  - No Clip toggle
 
 - **Visuals & QoL**  
   - Ambient/clock controls, camera zoom and FOV  
@@ -87,7 +86,6 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/zaerrruwww/zryx-vd/ma
 | **Auto Skill Check** | Hits perfect skill checks on generators. |
 | **God Mode** | Prevents death/down state. |
 | **No Clip** | Walk through walls. |
-| **Moonwalk** | In-place sway with custom keybind and intensity. |
 | **WalkSpeed** | Movement speed override. |
 | **Menu Keybind** | Custom key to open/close the UI (default: `Right Shift`). |
 | **Theme & Save** | UI appearance tweaks with persistent config. |
@@ -100,7 +98,6 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/zaerrruwww/zryx-vd/ma
 |--------|-----|
 | **Open/Close GUI** | `Right Shift` |
 | **Aimbot / Aimlock** | Hold `Right Click` |
-| **Moonwalk** | *Via UI toggle* |
 
 > *All other options are controlled through the graphical interface.*
 
@@ -135,7 +132,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/zaerrruwww/zryx-vd/ma
   - Aimbot, Aimlock & FOV with prediction  
   - Full ESP system with status  
   - Auto-parry, auto skill check, god mode  
-  - No Clip, Moonwalk, walk speed override, masked powers  
+  - No Clip, walk speed override, masked powers  
   - Custom theme with save/load
 
 ---
