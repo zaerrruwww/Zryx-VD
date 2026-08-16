@@ -111,12 +111,13 @@ local RunService = game:GetService("RunService")
 Window:SetUIScale(IsMobile and 1 or 0.85)
 
 -- === MOUSE LOCK (seperti tekan Esc) ===
--- Buka menu -> kursor bebas & kamera beku, tutup menu -> kursor kunci ke tengah (gameplay FPS)
--- Spectator (mati) -> kursor bebas supaya bisa klik UI spectator
-local menuOpen = false
+-- Tiap frame cek langsung status menu dari variabel asli WindUI (Window.Closed).
+-- Menu buka  -> kursor bebas + kamera beku
+-- Menu tutup & hidup -> kursor kunci ke tengah (gameplay FPS)
+-- Menu tutup & mati/spectator -> kursor bebas (biar UI spectator bisa diklik)
 local frozenCamera = nil
-local isSpectating = false
-local function isSpectator()
+
+local function isSpectatorNow()
     local char = LocalPlayer.Character
     if not char then return true end
     local hum = char:FindFirstChildOfClass("Humanoid")
@@ -124,71 +125,33 @@ local function isSpectator()
     return hum.Health <= 0
 end
 
-local function applyMouseState()
-    if IsMobile then return end
-    if menuOpen or isSpectating then
-        UserInputService.MouseBehavior = Enum.MouseBehavior.Default
-        UserInputService.MouseIconEnabled = true
-    else
-        UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
-        UserInputService.MouseIconEnabled = false
-    end
-end
-
-local function setMenuOpen(open)
-    menuOpen = open
-    if IsMobile then return end
-    local cam = workspace.CurrentCamera
-    if open then
-        if cam then
-            frozenCamera = cam.CFrame
-        end
-    else
-        frozenCamera = nil
-    end
-    applyMouseState()
-end
-
-local function setSpectating(spectating)
-    if isSpectating == spectating then return end
-    isSpectating = spectating
-    if spectating then
-        frozenCamera = nil
-    end
-    applyMouseState()
-end
-
-pcall(function()
-    if Window.OnOpen then Window:OnOpen(function() setMenuOpen(true) end) end
-    if Window.OnClose then Window:OnClose(function() setMenuOpen(false) end) end
-end)
-
--- inisialisasi state awal berdasarkan status window
-task.spawn(function()
-    task.wait(0.1)
-    if not IsMobile then
-        if Window.Closed == true then
-            setMenuOpen(false)
-        elseif Window.Closed == false then
-            setMenuOpen(true)
-        end
-    end
-end)
-
-LocalPlayer.CharacterAdded:Connect(function()
-    task.wait(0.5)
-    setSpectating(false)
-end)
-
 RunService:BindToRenderStep("ZryxMouseLock", Enum.RenderPriority.Last.Value, function()
     if IsMobile then return end
-    setSpectating(isSpectator())
-    if menuOpen then
+
+    local menuOpenNow = (Window.Closed == false)
+    local cam = workspace.CurrentCamera
+
+    if menuOpenNow then
+        -- MENU BUKA
         UserInputService.MouseBehavior = Enum.MouseBehavior.Default
         UserInputService.MouseIconEnabled = true
-        local cam = workspace.CurrentCamera
-        if cam and frozenCamera then
+        if cam then
+            if not frozenCamera then
+                frozenCamera = cam.CFrame
+            end
             cam.CFrame = frozenCamera
+        end
+    else
+        -- MENU TUTUP
+        frozenCamera = nil
+        if isSpectatorNow() then
+            -- spectator -> kursor bebas
+            UserInputService.MouseBehavior = Enum.MouseBehavior.Default
+            UserInputService.MouseIconEnabled = true
+        else
+            -- hidup -> kunci ke tengah
+            UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
+            UserInputService.MouseIconEnabled = false
         end
     end
 end)
