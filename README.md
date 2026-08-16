@@ -22,6 +22,7 @@ Advanced Lua script for **Roblox Violence District** featuring Aimbot, Aimlock, 
 - **Combat**  
   - Aimbot & Aimlock with adjustable strength, prediction and target selection (All / Killer / Survivor / SCP)  
   - Selectable aim part (Head / HumanoidRootPart), custom FOV and FOV circle  
+  - On-screen **Mobile Aim Button** (draggable, hold to aim) for touch devices  
   - Auto-parry that reacts to killer attack animations in real time  
   - Auto carry & hook for killers  
   - Masked powers (Cobra, Richter, Brandon, Rabbit, Alex) with activate/deactivate
@@ -79,7 +80,8 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/zaerrruwww/zryx-vd/ma
 
 | Option | Description |
 |--------|-------------|
-| **Aimbot / Aimlock** | Auto-aim at enemies while holding right click. |
+| **Aimbot / Aimlock** | Auto-aim at enemies while holding right click (or the mobile aim button). |
+| **Mobile Aim Button** | Draggable on-screen button; hold to aim on touch devices. |
 | **FOV Circle** | Shows the aimbot FOV radius on screen. |
 | **ESP** | Highlight players, generators, pallets, windows and SCPs. |
 | **Auto Parry** | Perfect parry against killer attacks automatically. |
@@ -96,10 +98,11 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/zaerrruwww/zryx-vd/ma
 
 | Action | Key |
 |--------|-----|
-| **Open/Close GUI** | `Right Shift` |
-| **Aimbot / Aimlock** | Hold `Right Click` |
+| **Open/Close GUI** | `Right Shift` (or the on-screen toggle button) |
+| **Aimbot / Aimlock** | Hold `Right Click` (or `Mobile Aim Button` on touch) |
 
 > *All other options are controlled through the graphical interface.*
+> *Full mobile support: parry, skill checks and aimbot all work via touch.*
 
 ---
 
@@ -133,7 +136,10 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/zaerrruwww/zryx-vd/ma
   - Full ESP system with status  
   - Auto-parry, auto skill check, god mode  
   - No Clip, walk speed override, masked powers  
-  - Custom theme with save/load
+  - Custom theme with save/load  
+  - **v1.1.0** – Mobile support  
+    - On-screen draggable **Mobile Aim Button** (hold to aim)  
+    - Full touch support for parry, skill checks and aimbot
 
 ---
 
