@@ -112,30 +112,52 @@ Window:SetUIScale(IsMobile and 1 or 0.85)
 
 -- === MOUSE LOCK (seperti tekan Esc) ===
 -- Buka menu -> kursor bebas & kamera beku, tutup menu -> kursor kunci ke tengah (gameplay FPS)
-local lastToggled = WindUI.Toggled
+local menuOpen = false
 local frozenCamera = nil
-RunService:BindToRenderStep("ZryxMouseLock", Enum.RenderPriority.Last.Value, function()
+local function setMenuOpen(open)
+    menuOpen = open
     if IsMobile then return end
     local cam = workspace.CurrentCamera
-    if WindUI.Toggled then
-        if UserInputService.MouseBehavior ~= Enum.MouseBehavior.Default then
-            UserInputService.MouseBehavior = Enum.MouseBehavior.Default
-        end
+    if open then
+        UserInputService.MouseBehavior = Enum.MouseBehavior.Default
         UserInputService.MouseIconEnabled = true
         if cam then
-            if not frozenCamera then
-                frozenCamera = cam.CFrame
-            end
-            cam.CFrame = frozenCamera
+            frozenCamera = cam.CFrame
         end
     else
-        if lastToggled then
-            UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
-            UserInputService.MouseIconEnabled = false
-            frozenCamera = nil
+        UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
+        UserInputService.MouseIconEnabled = false
+        frozenCamera = nil
+    end
+end
+
+pcall(function()
+    if Window.OnOpen then Window:OnOpen(function() setMenuOpen(true) end) end
+    if Window.OnClose then Window:OnClose(function() setMenuOpen(false) end) end
+end)
+
+-- inisialisasi state awal berdasarkan status window
+task.spawn(function()
+    task.wait(0.1)
+    if not IsMobile then
+        if Window.Closed == true then
+            setMenuOpen(false)
+        elseif Window.Closed == false then
+            setMenuOpen(true)
         end
     end
-    lastToggled = WindUI.Toggled
+end)
+
+RunService:BindToRenderStep("ZryxMouseLock", Enum.RenderPriority.Last.Value, function()
+    if IsMobile then return end
+    if menuOpen then
+        UserInputService.MouseBehavior = Enum.MouseBehavior.Default
+        UserInputService.MouseIconEnabled = true
+        local cam = workspace.CurrentCamera
+        if cam and frozenCamera then
+            cam.CFrame = frozenCamera
+        end
+    end
 end)
 
 -- Custom watermark (WindUI has no draggable label)
