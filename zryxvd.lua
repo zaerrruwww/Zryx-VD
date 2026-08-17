@@ -118,17 +118,31 @@ Window:SetUIScale(IsMobile and 1 or 0.85)
 -- buka/tutup lewat method ini). Polling Visible/Closed gagal karena
 -- frame luar tetap Visible saat close.
 if not IsMobile then
-    -- Game VD mengatur kursor SETIAP FRAME di loop RenderStepped:
-    --   LockCenter saat hidup & di round, Default saat lobby/spec/mati.
-    -- Jadi kita TIDAK perlu mendeteksi round manual.
-    --   Menu WindUI BUKA  -> paksa Default + icon (menang via priority Last),
-    --                        biar bisa klik menu.
-    --   Menu WindUI TUTUP -> JANGAN sentuh kursor sama sekali, biarkan game
-    --                        yang mengatur (otomatis terkunci saat round,
-    --                        bebas saat lobby/spec).
-    -- Deteksi buka/tutup: polling Window.Closed (diset sinkron di aw.Close/Open)
-    -- + wrapper Open/Close sebagai fallback (semua jalur UI lewat method ini).
+    -- PENTING (ditemukan dari script game Violence District):
+    -- Game punya loop RenderStepped yg memaksa kursor SETIAP FRAME:
+    --   jc=true  (default di desktop) -> paksa Default (kursor bebas)
+    --   jc=false -> LockCenter saat di round (Team bukan spec/lobby + Health>0),
+    --               Default saat mati/spec/lobby.
+    -- BindToRenderStep(Last) KALAH karena semua bind jalan SEBELUM event
+    -- RenderStepped. Jadi kita pakai RenderStepped:Connect + Heartbeat yg
+    -- terdaftar SETELAH script game -> eksekusi setelah loop game -> menang.
     local menuOpen = true
+
+    -- kondisi "di round" persis seperti yg dipakai game VD
+    local function isInRound()
+        local team = LocalPlayer.Team
+        if not team then return false end
+        local name = team.Name
+        local low = name:lower()
+        if name == "Spectators" or low:find("spec") or low:find("lobby") then
+            return false
+        end
+        local char = LocalPlayer.Character
+        if not char then return false end
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if not hum then return false end
+        return hum.Health > 0
+    end
 
     local function applyMouse()
         local ok, closed = pcall(function()
@@ -138,6 +152,12 @@ if not IsMobile then
             menuOpen = closed == false
         end
         if menuOpen then
+            UserInputService.MouseBehavior = Enum.MouseBehavior.Default
+            UserInputService.MouseIconEnabled = true
+        elseif isInRound() then
+            UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
+            UserInputService.MouseIconEnabled = false
+        else
             UserInputService.MouseBehavior = Enum.MouseBehavior.Default
             UserInputService.MouseIconEnabled = true
         end
@@ -164,8 +184,8 @@ if not IsMobile then
         end
     end
 
-    -- jaga-jaga tiap frame (menang atas loop game saat menu buka)
-    RunService:BindToRenderStep("ZryxMouseFree", Enum.RenderPriority.Last.Value, applyMouse)
+    -- menang atas loop game: RenderStepped (setelah koneksi game) + Heartbeat
+    RunService.RenderStepped:Connect(applyMouse)
     RunService.Heartbeat:Connect(applyMouse)
 end
 
