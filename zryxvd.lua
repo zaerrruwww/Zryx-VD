@@ -122,42 +122,51 @@ if not IsMobile then
     -- Tidak bergantung API WindUI (OnToggle/OnOpen/OnClose) yg beda-beda versi.
     -- KURSOR: game VD punya loop RenderStepped yg memaksa kursor Default setiap
     -- frame (flag jc=true default desktop). BindToRenderStep KALAH (jalan sebelum
-    -- event RenderStepped). Jadi kita force SETIAP FRAME lewat RenderStepped:Connect
-    -- + Heartbeat (terdaftar setelah script game -> menang), dan saat menu TUTUP
-    -- kita tetap force LockCenter (kalau di round) / Default (lobby/spec/mati).
+    -- event RenderStepped). Kita force SETIAP FRAME lewat RenderStepped:Connect
+    -- + Heartbeat yg terdaftar SETELAH script game -> jalan terakhir (FIFO) -> menang.
     local isMenuOpen = true
 
-    -- kondisi "di round" persis seperti yg dipakai game VD
-    local function isInRound()
+    -- kondisi "di match" (round): hidup, bukan spectator/lobby.
+    -- FALLBACK AGGRESIF: kalau menu TUTUP dan tidak jelas terbukti sedang di
+    -- lobby/spectator/mati -> dianggap in-match -> kursor dikunci paksa.
+    local function isInMatch()
         local team = LocalPlayer.Team
-        if not team then return false end
-        local name = team.Name
-        local low = name:lower()
-        if name == "Spectators" or low:find("spec") or low:find("lobby") then
-            return false
+        if team then
+            local name = team.Name
+            local low = name:lower()
+            if name == "Spectators" or low:find("spec") or low:find("lobby") then
+                return false
+            end
         end
         local char = LocalPlayer.Character
-        if not char then return false end
-        local hum = char:FindFirstChildOfClass("Humanoid")
-        if not hum then return false end
-        return hum.Health > 0
+        if char then
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            if hum then
+                if hum.Health > 0 then
+                    return true
+                end
+                return false -- mati -> spectator -> bebas
+            end
+        end
+        return true -- tidak jelas terbukti lobby/spec/mati -> agresif kunci
     end
 
-    local function applyMouse()
+    local function applyCursorState()
         if isMenuOpen then
             UserInputService.MouseBehavior = Enum.MouseBehavior.Default
             UserInputService.MouseIconEnabled = true
-        elseif isInRound() then
-            UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
-            UserInputService.MouseIconEnabled = false
+            UserInputService.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.None
         else
-            UserInputService.MouseBehavior = Enum.MouseBehavior.Default
-            UserInputService.MouseIconEnabled = true
+            if isInMatch() then
+                UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
+                UserInputService.MouseIconEnabled = false
+                UserInputService.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.ForceHide
+            end
         end
     end
 
-    -- hook input manual (pengganti OnToggle); key dibaca dari ToggleKey WindUI
-    -- (sinkron dgn keybind "Toggle UI Key" di menu, jadi ikut berubah)
+    -- hook input manual (pengganti OnToggle); key dibaca dinamis dari ToggleKey
+    -- WindUI -> sinkron otomatis dgn keybind "Toggle UI Key" di menu
     local function getToggleKey()
         local ok, key = pcall(function()
             return Window.ToggleKey
@@ -168,7 +177,7 @@ if not IsMobile then
     UserInputService.InputBegan:Connect(function(input, gameProcessed)
         if input.KeyCode == getToggleKey() then
             isMenuOpen = not isMenuOpen
-            applyMouse()
+            applyCursorState()
         end
     end)
 
@@ -180,9 +189,9 @@ if not IsMobile then
         if ok and typeof(closed) == "boolean" then
             isMenuOpen = closed == false
         end
-        applyMouse()
+        applyCursorState()
     end)
-    RunService.Heartbeat:Connect(applyMouse)
+    RunService.Heartbeat:Connect(applyCursorState)
 end
 
 -- Custom watermark (WindUI has no draggable label)
