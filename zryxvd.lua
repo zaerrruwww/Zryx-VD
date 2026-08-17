@@ -118,14 +118,14 @@ Window:SetUIScale(IsMobile and 1 or 0.85)
 -- buka/tutup lewat method ini). Polling Visible/Closed gagal karena
 -- frame luar tetap Visible saat close.
 if not IsMobile then
-    -- DETEKSI MENU: pakai event resmi WindUI OnOpen/OnClose (Footagesus WindUI
-    -- tidak punya OnToggle seperti tree-hub; OnOpen/OnClose setara dan dipanggil
-    -- setiap buka/tutup termasuk via toggle key, minimize, tombol X).
-    -- KURSOR: game VD memaksa kursor setiap frame di loop RenderStepped-nya
-    -- (flag jc=true default di desktop -> paksa Default). BindToRenderStep KALAH
-    -- (jalan sebelum event RenderStepped), jadi kita pakai RenderStepped:Connect
-    -- + Heartbeat yg terdaftar SETELAH script game -> menang tiap frame.
-    local menuOpen = true
+    -- DETEKSI MENU: hook input manual (pola user) — tombol toggle menu WindUI.
+    -- Tidak bergantung API WindUI (OnToggle/OnOpen/OnClose) yg beda-beda versi.
+    -- KURSOR: game VD punya loop RenderStepped yg memaksa kursor Default setiap
+    -- frame (flag jc=true default desktop). BindToRenderStep KALAH (jalan sebelum
+    -- event RenderStepped). Jadi kita force SETIAP FRAME lewat RenderStepped:Connect
+    -- + Heartbeat (terdaftar setelah script game -> menang), dan saat menu TUTUP
+    -- kita tetap force LockCenter (kalau di round) / Default (lobby/spec/mati).
+    local isMenuOpen = true
 
     -- kondisi "di round" persis seperti yg dipakai game VD
     local function isInRound()
@@ -144,7 +144,7 @@ if not IsMobile then
     end
 
     local function applyMouse()
-        if menuOpen then
+        if isMenuOpen then
             UserInputService.MouseBehavior = Enum.MouseBehavior.Default
             UserInputService.MouseIconEnabled = true
         elseif isInRound() then
@@ -156,29 +156,29 @@ if not IsMobile then
         end
     end
 
-    -- event resmi WindUI (setara OnToggle di contoh tree-hub)
-    pcall(function()
-        if Window.OnOpen then
-            Window:OnOpen(function()
-                menuOpen = true
-                applyMouse()
-            end)
-        end
-        if Window.OnClose then
-            Window:OnClose(function()
-                menuOpen = false
-                applyMouse()
-            end)
+    -- hook input manual (pengganti OnToggle); key dibaca dari ToggleKey WindUI
+    -- (sinkron dgn keybind "Toggle UI Key" di menu, jadi ikut berubah)
+    local function getToggleKey()
+        local ok, key = pcall(function()
+            return Window.ToggleKey
+        end)
+        return ok and typeof(key) == "EnumItem" and key or Enum.KeyCode.RightShift
+    end
+
+    UserInputService.InputBegan:Connect(function(input, gameProcessed)
+        if input.KeyCode == getToggleKey() then
+            isMenuOpen = not isMenuOpen
+            applyMouse()
         end
     end)
 
-    -- polling Window.Closed sebagai backup deteksi (diset sinkron di aw.Close/Open)
+    -- backup: polling Window.Closed tiap frame (kalau versi WindUI punya field ini)
     RunService.RenderStepped:Connect(function()
         local ok, closed = pcall(function()
             return Window.Closed
         end)
         if ok and typeof(closed) == "boolean" then
-            menuOpen = closed == false
+            isMenuOpen = closed == false
         end
         applyMouse()
     end)
