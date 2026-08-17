@@ -124,6 +124,10 @@ if not IsMobile then
     -- frame (flag jc=true default desktop). BindToRenderStep KALAH (jalan sebelum
     -- event RenderStepped). Kita force SETIAP FRAME lewat RenderStepped:Connect
     -- + Heartbeat yg terdaftar SETELAH script game -> jalan terakhir (FIFO) -> menang.
+    -- ICON KURSOR NYANGKUT: diatasi dgn 3 lapis: MouseIconEnabled=false +
+    -- OverrideMouseIconBehavior=ForceHide + bersihkan GUI focus (GuiService
+    -- SelectedObject & GuiObject.Modal WindUI) saat menu tertutup.
+    local GuiService = game:GetService("GuiService")
     local isMenuOpen = true
 
     -- kondisi "di match" (round): hidup, bukan spectator/lobby.
@@ -151,6 +155,32 @@ if not IsMobile then
         return true -- tidak jelas terbukti lobby/spec/mati -> agresif kunci
     end
 
+    -- netralkan Modal + selected object WindUI saat menu tertutup
+    -- (ScreenGui WindUI bernama "WindUI" di CoreGui/PlayerGui)
+    local function clearGuiFocus()
+        pcall(function()
+            GuiService.SelectedObject = nil
+        end)
+        for _, container in ipairs({ game:GetService("CoreGui"), LocalPlayer:FindFirstChild("PlayerGui") }) do
+            if container then
+                for _, gui in ipairs(container:GetChildren()) do
+                    if gui:IsA("ScreenGui") and (gui.Name == "WindUI" or gui.Name:find("Wind") or gui.Name:find("Zaer") or gui.Name:find("External")) then
+                        pcall(function()
+                            gui.Enabled = not isMenuOpen
+                        end)
+                        for _, desc in ipairs(gui:GetDescendants()) do
+                            if desc:IsA("GuiObject") and desc.Modal then
+                                pcall(function()
+                                    desc.Modal = false
+                                end)
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
     local function applyCursorState()
         if isMenuOpen then
             UserInputService.MouseBehavior = Enum.MouseBehavior.Default
@@ -158,6 +188,9 @@ if not IsMobile then
             UserInputService.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.None
         else
             if isInMatch() then
+                -- 1. bersihkan GUI focus
+                clearGuiFocus()
+                -- 2. kunci & sembunyikan kursor (3 lapis)
                 UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
                 UserInputService.MouseIconEnabled = false
                 UserInputService.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.ForceHide
@@ -177,6 +210,11 @@ if not IsMobile then
     UserInputService.InputBegan:Connect(function(input, gameProcessed)
         if input.KeyCode == getToggleKey() then
             isMenuOpen = not isMenuOpen
+            if isMenuOpen then
+                pcall(function()
+                    GuiService.SelectedObject = nil
+                end)
+            end
             applyCursorState()
         end
     end)
