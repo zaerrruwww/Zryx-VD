@@ -125,16 +125,13 @@ if not IsMobile then
     -- event RenderStepped). Kita force SETIAP FRAME lewat RenderStepped:Connect
     -- + Heartbeat yg terdaftar SETELAH script game -> jalan terakhir (FIFO) -> menang.
     -- ICON KURSOR NYANGKUT: 3 lapis (MouseIconEnabled=false + OverrideMouseIconBehavior
-    -- =ForceHide + GUI focus bersih) + MODAL STRIP GLOBAL + sembunyikan custom
-    -- cursor ImageLabel milik game.
+    -- =ForceHide + GUI focus bersih).
     local Players = game:GetService("Players")
-    local CoreGui = game:GetService("CoreGui")
     local GuiService = game:GetService("GuiService")
     local VirtualInputManager = game:GetService("VirtualInputManager")
     local Workspace = game:GetService("Workspace")
     local LocalPlayer = Players.LocalPlayer
     local isMenuOpen = true
-    local closingRobloxMenu = false
     local wasMenuOpen = true
 
     -- LocalPlayer bisa nil saat load (teleport/join awal) -> refresh tiap frame
@@ -173,82 +170,6 @@ if not IsMobile then
         return true -- tidak jelas terbukti lobby/spec/mati -> agresif kunci
     end
 
-    -- MODAL STRIP GLOBAL (semua ScreenGui di CoreGui + PlayerGui, bukan cuma WindUI)
-    -- + sembunyikan custom cursor ImageLabel/ImageButton milik game (VD).
-    -- CATATAN: ScreenGui WindUI TIDAK di-set Enabled=false karena WindUI tidak
-    -- pernah restore gui.Enabled saat Open (hanya Visible frame dalam) -> menu
-    -- tidak akan bisa dibuka lagi. Untuk ScreenGui lain (eksternal) Enabled tetap
-    -- di-disable saat menu tutup.
-    local function wipeAllGameModals()
-        local playerGui = LocalPlayer and LocalPlayer:FindFirstChild("PlayerGui")
-        local targets = { CoreGui, playerGui }
-        for _, parentObj in ipairs(targets) do
-            if parentObj then
-                for _, desc in ipairs(parentObj:GetDescendants()) do
-                    if desc:IsA("GuiObject") and desc.Modal then
-                        pcall(function()
-                            desc.Modal = false
-                        end)
-                    end
-                    if (desc:IsA("ImageLabel") or desc:IsA("ImageButton")) then
-                        local n = desc.Name:lower()
-                        if n:find("cursor") or n:find("pointer") or n:find("mouse") then
-                            pcall(function()
-                                desc.Visible = isMenuOpen
-                            end)
-                        end
-                    end
-                end
-                if parentObj ~= CoreGui then
-                    for _, gui in ipairs(parentObj:GetChildren()) do
-                        if gui:IsA("ScreenGui") and gui.Name ~= "WindUI"
-                            and (gui.Name:find("Wind") or gui.Name:find("Zaer") or gui.Name:find("External"))
-                        then
-                            pcall(function()
-                                gui.Enabled = not isMenuOpen
-                            end)
-                        end
-                    end
-                end
-            end
-        end
-    end
-
-    -- TUTUP MENU ROBLOX (Esc menu): menu Roblox yg bikin kursor bebas/nyangkut.
-    -- Roblox otomatis menutup menu Esc ketika ada GuiObject Modal aktif
-    -- (itulah kenapa toggle keybind menu script menutupnya — WindUI punya modal
-    -- saat open). Kita tiru efeknya dgn frame transparan ber-Modal sekejap,
-    -- tanpa menampilkan menu script.
-    local function closeRobloxMenu()
-        if closingRobloxMenu then
-            return
-        end
-        closingRobloxMenu = true
-        local ok = pcall(function()
-            local g = Instance.new("ScreenGui")
-            g.Name = "ZryxModalKick"
-            g.IgnoreGuiInset = true
-            g.DisplayOrder = 2147483647
-            g.ResetOnSpawn = false
-            local f = Instance.new("Frame")
-            f.Size = UDim2.new(0, 1, 0, 1)
-            f.BackgroundTransparency = 1
-            f.Modal = true
-            f.Visible = true
-            f.Parent = g
-            g.Parent = CoreGui
-            task.defer(function()
-                if g and g.Parent then
-                    g:Destroy()
-                end
-                closingRobloxMenu = false
-            end)
-        end)
-        if not ok then
-            closingRobloxMenu = false
-        end
-    end
-
     -- RE-FOCUS KAMERA saat menu ditutup (pola Roblox Esc Menu): klik kiri di
     -- tengah viewport setelah GUI update -> sinyal ke modul kamera VD utk ambil
     -- alih & kunci kursor secara native. Dikirim SEKALI per transisi tutup
@@ -282,24 +203,13 @@ if not IsMobile then
                 pcall(function()
                     GuiService.SelectedObject = nil
                 end)
-                -- 2. modal strip + sembunyikan custom cursor game
-                wipeAllGameModals()
-                -- 3. kunci & sembunyikan kursor (3 lapis)
+                -- 2. kunci & sembunyikan kursor (3 lapis)
                 UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
                 UserInputService.MouseIconEnabled = false
                 UserInputService.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.ForceHide
-                -- 3b. re-focus kamera (klik tengah viewport) sekali per transisi tutup
+                -- 3. re-focus kamera (klik tengah viewport) sekali per transisi tutup
                 if wasMenuOpen then
                     refocusCameraInput()
-                end
-                -- 4. tutup menu Roblox (Esc menu) kalau terbuka — penyebab kursor
-                --    bebas/nyangkut yg sebenarnya
-                local okMenu, menuOpen = pcall(function()
-                    return GuiService.MenuIsOpen
-                end)
-                if okMenu and menuOpen then
-                    print("[Zryx] Roblox menu (Esc) terdeteksi terbuka — menutup otomatis")
-                    closeRobloxMenu()
                 end
             end
         end
@@ -336,30 +246,6 @@ if not IsMobile then
         applyCursorState()
     end)
     RunService.Heartbeat:Connect(applyCursorState)
-
-    -- DIAGNOSTIC sementara (1 detik): MouseBehavior, MouseIconEnabled, Modal aktif
-    task.spawn(function()
-        while true do
-            task.wait(1)
-            local playerGui = LocalPlayer and LocalPlayer:FindFirstChild("PlayerGui")
-            local modalNames = {}
-            if playerGui then
-                for _, d in ipairs(playerGui:GetDescendants()) do
-                    if d:IsA("GuiObject") and d.Modal then
-                        table.insert(modalNames, d.Name)
-                    end
-                end
-            end
-            print(string.format(
-                "[CursorDiag] Menu=%s Match=%s MouseBehavior=%s Icon=%s Modal={%s}",
-                tostring(isMenuOpen),
-                tostring(isInMatch()),
-                tostring(UserInputService.MouseBehavior),
-                tostring(UserInputService.MouseIconEnabled),
-                table.concat(modalNames, ",")
-            ))
-        end
-    end)
 end
 
 -- Custom watermark (WindUI has no draggable label)
