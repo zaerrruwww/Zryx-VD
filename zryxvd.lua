@@ -118,53 +118,39 @@ Window:SetUIScale(IsMobile and 1 or 0.85)
 -- buka/tutup lewat method ini). Polling Visible/Closed gagal karena
 -- frame luar tetap Visible saat close.
 if not IsMobile then
-    -- Pendekatan "simpan & pulihkan":
-    --   Saat menu BUKA -> simpan state mouse asli game (yg bener: game yg ngunci
-    --                     ke LockCenter saat round), lalu paksa Default biar bisa
-    --                     klik menu.
-    --   Saat menu TUTUP -> kembalikan state mouse yg disimpan. Game Violence
-    --                     District sendiri yg nentuin LockCenter saat round /
-    --                     Default saat lobby, jadi ga perlu deteksi round manual.
-    -- Sumber kebenaran: polling Window.Closed (aw.Close() set aw.Closed=true
-    -- secara sinkron; aw.Destroy() juga manggil aw:Close() dulu) + wrapper fallback.
-    local savedBehavior = nil
-    local savedIcon = nil
-    local wasOpen = false
+    -- Game VD mengatur kursor SETIAP FRAME di loop RenderStepped:
+    --   LockCenter saat hidup & di round, Default saat lobby/spec/mati.
+    -- Jadi kita TIDAK perlu mendeteksi round manual.
+    --   Menu WindUI BUKA  -> paksa Default + icon (menang via priority Last),
+    --                        biar bisa klik menu.
+    --   Menu WindUI TUTUP -> JANGAN sentuh kursor sama sekali, biarkan game
+    --                        yang mengatur (otomatis terkunci saat round,
+    --                        bebas saat lobby/spec).
+    -- Deteksi buka/tutup: polling Window.Closed (diset sinkron di aw.Close/Open)
+    -- + wrapper Open/Close sebagai fallback (semua jalur UI lewat method ini).
+    local menuOpen = true
 
     local function applyMouse()
         local ok, closed = pcall(function()
             return Window.Closed
         end)
-        local isOpen = false
         if ok and typeof(closed) == "boolean" then
-            isOpen = closed == false
+            menuOpen = closed == false
         end
-        isOpen = isOpen or wasOpen
-
-        if isOpen and not wasOpen then
-            savedBehavior = UserInputService.MouseBehavior
-            savedIcon = UserInputService.MouseIconEnabled
-        elseif not isOpen and wasOpen then
-            if savedBehavior ~= nil then
-                UserInputService.MouseBehavior = savedBehavior
-                UserInputService.MouseIconEnabled = savedIcon
-            end
-        end
-        wasOpen = isOpen
-
-        if isOpen then
+        if menuOpen then
             UserInputService.MouseBehavior = Enum.MouseBehavior.Default
             UserInputService.MouseIconEnabled = true
         end
     end
 
-    -- bungkus Open/Close asli sebagai fallback + update langsung (Toggle & tombol X
-    -- ikut karena aw.Destroy() memanggil aw:Close() dulu)
+    -- bungkus Open/Close asli (Toggle, tombol minimize, tombol X -> semua
+    -- lewat Close; aw.Destroy() juga panggil aw:Close() dulu)
     local oldOpen = Window.Open
     local oldClose = Window.Close
     if oldOpen then
         Window.Open = function(self, ...)
             local r = oldOpen(self, ...)
+            menuOpen = true
             applyMouse()
             return r
         end
@@ -172,12 +158,13 @@ if not IsMobile then
     if oldClose then
         Window.Close = function(self, ...)
             local r = oldClose(self, ...)
+            menuOpen = false
             applyMouse()
             return r
         end
     end
 
-    -- jaga-jaga tiap frame (biar ngalahin game yg set cursor terus saat menu buka)
+    -- jaga-jaga tiap frame (menang atas loop game saat menu buka)
     RunService:BindToRenderStep("ZryxMouseFree", Enum.RenderPriority.Last.Value, applyMouse)
     RunService.Heartbeat:Connect(applyMouse)
 end
