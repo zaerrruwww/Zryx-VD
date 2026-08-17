@@ -130,9 +130,12 @@ if not IsMobile then
     local Players = game:GetService("Players")
     local CoreGui = game:GetService("CoreGui")
     local GuiService = game:GetService("GuiService")
+    local VirtualInputManager = game:GetService("VirtualInputManager")
+    local Workspace = game:GetService("Workspace")
     local LocalPlayer = Players.LocalPlayer
     local isMenuOpen = true
     local closingRobloxMenu = false
+    local wasMenuOpen = true
 
     -- LocalPlayer bisa nil saat load (teleport/join awal) -> refresh tiap frame
     local function refreshLocalPlayer()
@@ -246,9 +249,30 @@ if not IsMobile then
         end
     end
 
+    -- RE-FOCUS KAMERA saat menu ditutup (pola Roblox Esc Menu): klik kiri di
+    -- tengah viewport setelah GUI update -> sinyal ke modul kamera VD utk ambil
+    -- alih & kunci kursor secara native. Dikirim SEKALI per transisi tutup
+    -- (bukan tiap frame).
+    local function refocusCameraInput()
+        task.defer(function()
+            pcall(function()
+                local cam = Workspace.CurrentCamera
+                if cam then
+                    local vp = cam.ViewportSize
+                    local x, y = vp.X / 2, vp.Y / 2
+                    VirtualInputManager:SendMouseButtonEvent(x, y, 1, true, game, 0)
+                    task.wait(0.02)
+                    VirtualInputManager:SendMouseButtonEvent(x, y, 1, false, game, 0)
+                    print("[Zryx] Camera refocus click sent (", x, ",", y, ")")
+                end
+            end)
+        end)
+    end
+
     local function applyCursorState()
         refreshLocalPlayer()
         if isMenuOpen then
+            GuiService.SelectedObject = nil
             UserInputService.MouseBehavior = Enum.MouseBehavior.Default
             UserInputService.MouseIconEnabled = true
             UserInputService.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.None
@@ -264,6 +288,10 @@ if not IsMobile then
                 UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
                 UserInputService.MouseIconEnabled = false
                 UserInputService.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.ForceHide
+                -- 3b. re-focus kamera (klik tengah viewport) sekali per transisi tutup
+                if wasMenuOpen then
+                    refocusCameraInput()
+                end
                 -- 4. tutup menu Roblox (Esc menu) kalau terbuka — penyebab kursor
                 --    bebas/nyangkut yg sebenarnya
                 local okMenu, menuOpen = pcall(function()
@@ -275,6 +303,7 @@ if not IsMobile then
                 end
             end
         end
+        wasMenuOpen = isMenuOpen
     end
 
     -- hook input manual (pengganti OnToggle); key dibaca dinamis dari ToggleKey
