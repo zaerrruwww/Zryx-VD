@@ -134,11 +134,22 @@ if not IsMobile then
     local isMenuOpen = true
     local closingRobloxMenu = false
 
+    -- LocalPlayer bisa nil saat load (teleport/join awal) -> refresh tiap frame
+    local function refreshLocalPlayer()
+        if not LocalPlayer then
+            LocalPlayer = Players.LocalPlayer
+        end
+    end
+
     -- kondisi "di match" (round): hidup, bukan spectator/lobby.
     -- FALLBACK AGGRESIF: kalau menu TUTUP dan tidak jelas terbukti sedang di
     -- lobby/spectator/mati -> dianggap in-match -> kursor dikunci paksa.
     local function isInMatch()
-        local team = LocalPlayer.Team
+        local lp = LocalPlayer
+        if not lp then
+            return true -- belum ada player; jangan error, agresif kunci
+        end
+        local team = lp.Team
         if team then
             local name = team.Name
             local low = name:lower()
@@ -146,7 +157,7 @@ if not IsMobile then
                 return false
             end
         end
-        local char = LocalPlayer.Character
+        local char = lp.Character
         if char then
             local hum = char:FindFirstChildOfClass("Humanoid")
             if hum then
@@ -166,7 +177,7 @@ if not IsMobile then
     -- tidak akan bisa dibuka lagi. Untuk ScreenGui lain (eksternal) Enabled tetap
     -- di-disable saat menu tutup.
     local function wipeAllGameModals()
-        local playerGui = LocalPlayer:FindFirstChild("PlayerGui")
+        local playerGui = LocalPlayer and LocalPlayer:FindFirstChild("PlayerGui")
         local targets = { CoreGui, playerGui }
         for _, parentObj in ipairs(targets) do
             if parentObj then
@@ -236,6 +247,7 @@ if not IsMobile then
     end
 
     local function applyCursorState()
+        refreshLocalPlayer()
         if isMenuOpen then
             UserInputService.MouseBehavior = Enum.MouseBehavior.Default
             UserInputService.MouseIconEnabled = true
@@ -300,7 +312,7 @@ if not IsMobile then
     task.spawn(function()
         while true do
             task.wait(1)
-            local playerGui = LocalPlayer:FindFirstChild("PlayerGui")
+            local playerGui = LocalPlayer and LocalPlayer:FindFirstChild("PlayerGui")
             local modalNames = {}
             if playerGui then
                 for _, d in ipairs(playerGui:GetDescendants()) do
