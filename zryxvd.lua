@@ -130,6 +130,7 @@ if not IsMobile then
     local Players = game:GetService("Players")
     local CoreGui = game:GetService("CoreGui")
     local GuiService = game:GetService("GuiService")
+    local LocalPlayer = Players.LocalPlayer
     local isMenuOpen = true
     local closingRobloxMenu = false
 
