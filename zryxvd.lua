@@ -131,6 +131,7 @@ if not IsMobile then
     local CoreGui = game:GetService("CoreGui")
     local GuiService = game:GetService("GuiService")
     local isMenuOpen = true
+    local closingRobloxMenu = false
 
     -- kondisi "di match" (round): hidup, bukan spectator/lobby.
     -- FALLBACK AGGRESIF: kalau menu TUTUP dan tidak jelas terbukti sedang di
@@ -198,6 +199,41 @@ if not IsMobile then
         end
     end
 
+    -- TUTUP MENU ROBLOX (Esc menu): menu Roblox yg bikin kursor bebas/nyangkut.
+    -- Roblox otomatis menutup menu Esc ketika ada GuiObject Modal aktif
+    -- (itulah kenapa toggle keybind menu script menutupnya — WindUI punya modal
+    -- saat open). Kita tiru efeknya dgn frame transparan ber-Modal sekejap,
+    -- tanpa menampilkan menu script.
+    local function closeRobloxMenu()
+        if closingRobloxMenu then
+            return
+        end
+        closingRobloxMenu = true
+        local ok = pcall(function()
+            local g = Instance.new("ScreenGui")
+            g.Name = "ZryxModalKick"
+            g.IgnoreGuiInset = true
+            g.DisplayOrder = 2147483647
+            g.ResetOnSpawn = false
+            local f = Instance.new("Frame")
+            f.Size = UDim2.new(0, 1, 0, 1)
+            f.BackgroundTransparency = 1
+            f.Modal = true
+            f.Visible = true
+            f.Parent = g
+            g.Parent = CoreGui
+            task.defer(function()
+                if g and g.Parent then
+                    g:Destroy()
+                end
+                closingRobloxMenu = false
+            end)
+        end)
+        if not ok then
+            closingRobloxMenu = false
+        end
+    end
+
     local function applyCursorState()
         if isMenuOpen then
             UserInputService.MouseBehavior = Enum.MouseBehavior.Default
@@ -215,6 +251,15 @@ if not IsMobile then
                 UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
                 UserInputService.MouseIconEnabled = false
                 UserInputService.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.ForceHide
+                -- 4. tutup menu Roblox (Esc menu) kalau terbuka — penyebab kursor
+                --    bebas/nyangkut yg sebenarnya
+                local okMenu, menuOpen = pcall(function()
+                    return GuiService.MenuIsOpen
+                end)
+                if okMenu and menuOpen then
+                    print("[Zryx] Roblox menu (Esc) terdeteksi terbuka — menutup otomatis")
+                    closeRobloxMenu()
+                end
             end
         end
     end
