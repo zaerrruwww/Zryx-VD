@@ -124,9 +124,11 @@ if not IsMobile then
     -- frame (flag jc=true default desktop). BindToRenderStep KALAH (jalan sebelum
     -- event RenderStepped). Kita force SETIAP FRAME lewat RenderStepped:Connect
     -- + Heartbeat yg terdaftar SETELAH script game -> jalan terakhir (FIFO) -> menang.
-    -- ICON KURSOR NYANGKUT: diatasi dgn 3 lapis: MouseIconEnabled=false +
-    -- OverrideMouseIconBehavior=ForceHide + bersihkan GUI focus (GuiService
-    -- SelectedObject & GuiObject.Modal WindUI) saat menu tertutup.
+    -- ICON KURSOR NYANGKUT: 3 lapis (MouseIconEnabled=false + OverrideMouseIconBehavior
+    -- =ForceHide + GUI focus bersih) + MODAL STRIP GLOBAL + sembunyikan custom
+    -- cursor ImageLabel milik game.
+    local Players = game:GetService("Players")
+    local CoreGui = game:GetService("CoreGui")
     local GuiService = game:GetService("GuiService")
     local isMenuOpen = true
 
@@ -155,25 +157,40 @@ if not IsMobile then
         return true -- tidak jelas terbukti lobby/spec/mati -> agresif kunci
     end
 
-    -- netralkan Modal + selected object WindUI saat menu tertutup
-    -- (ScreenGui WindUI bernama "WindUI" di CoreGui/PlayerGui)
-    local function clearGuiFocus()
-        pcall(function()
-            GuiService.SelectedObject = nil
-        end)
-        for _, container in ipairs({ game:GetService("CoreGui"), LocalPlayer:FindFirstChild("PlayerGui") }) do
-            if container then
-                for _, gui in ipairs(container:GetChildren()) do
-                    if gui:IsA("ScreenGui") and (gui.Name == "WindUI" or gui.Name:find("Wind") or gui.Name:find("Zaer") or gui.Name:find("External")) then
+    -- MODAL STRIP GLOBAL (semua ScreenGui di CoreGui + PlayerGui, bukan cuma WindUI)
+    -- + sembunyikan custom cursor ImageLabel/ImageButton milik game (VD).
+    -- CATATAN: ScreenGui WindUI TIDAK di-set Enabled=false karena WindUI tidak
+    -- pernah restore gui.Enabled saat Open (hanya Visible frame dalam) -> menu
+    -- tidak akan bisa dibuka lagi. Untuk ScreenGui lain (eksternal) Enabled tetap
+    -- di-disable saat menu tutup.
+    local function wipeAllGameModals()
+        local playerGui = LocalPlayer:FindFirstChild("PlayerGui")
+        local targets = { CoreGui, playerGui }
+        for _, parentObj in ipairs(targets) do
+            if parentObj then
+                for _, desc in ipairs(parentObj:GetDescendants()) do
+                    if desc:IsA("GuiObject") and desc.Modal then
                         pcall(function()
-                            gui.Enabled = not isMenuOpen
+                            desc.Modal = false
                         end)
-                        for _, desc in ipairs(gui:GetDescendants()) do
-                            if desc:IsA("GuiObject") and desc.Modal then
-                                pcall(function()
-                                    desc.Modal = false
-                                end)
-                            end
+                    end
+                    if (desc:IsA("ImageLabel") or desc:IsA("ImageButton")) then
+                        local n = desc.Name:lower()
+                        if n:find("cursor") or n:find("pointer") or n:find("mouse") then
+                            pcall(function()
+                                desc.Visible = isMenuOpen
+                            end)
+                        end
+                    end
+                end
+                if parentObj ~= CoreGui then
+                    for _, gui in ipairs(parentObj:GetChildren()) do
+                        if gui:IsA("ScreenGui") and gui.Name ~= "WindUI"
+                            and (gui.Name:find("Wind") or gui.Name:find("Zaer") or gui.Name:find("External"))
+                        then
+                            pcall(function()
+                                gui.Enabled = not isMenuOpen
+                            end)
                         end
                     end
                 end
@@ -188,9 +205,13 @@ if not IsMobile then
             UserInputService.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.None
         else
             if isInMatch() then
-                -- 1. bersihkan GUI focus
-                clearGuiFocus()
-                -- 2. kunci & sembunyikan kursor (3 lapis)
+                -- 1. bersihkan GUI focus Roblox
+                pcall(function()
+                    GuiService.SelectedObject = nil
+                end)
+                -- 2. modal strip + sembunyikan custom cursor game
+                wipeAllGameModals()
+                -- 3. kunci & sembunyikan kursor (3 lapis)
                 UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
                 UserInputService.MouseIconEnabled = false
                 UserInputService.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.ForceHide
@@ -210,11 +231,9 @@ if not IsMobile then
     UserInputService.InputBegan:Connect(function(input, gameProcessed)
         if input.KeyCode == getToggleKey() then
             isMenuOpen = not isMenuOpen
-            if isMenuOpen then
-                pcall(function()
-                    GuiService.SelectedObject = nil
-                end)
-            end
+            pcall(function()
+                GuiService.SelectedObject = nil
+            end)
             applyCursorState()
         end
     end)
@@ -230,6 +249,30 @@ if not IsMobile then
         applyCursorState()
     end)
     RunService.Heartbeat:Connect(applyCursorState)
+
+    -- DIAGNOSTIC sementara (1 detik): MouseBehavior, MouseIconEnabled, Modal aktif
+    task.spawn(function()
+        while true do
+            task.wait(1)
+            local playerGui = LocalPlayer:FindFirstChild("PlayerGui")
+            local modalNames = {}
+            if playerGui then
+                for _, d in ipairs(playerGui:GetDescendants()) do
+                    if d:IsA("GuiObject") and d.Modal then
+                        table.insert(modalNames, d.Name)
+                    end
+                end
+            end
+            print(string.format(
+                "[CursorDiag] Menu=%s Match=%s MouseBehavior=%s Icon=%s Modal={%s}",
+                tostring(isMenuOpen),
+                tostring(isInMatch()),
+                tostring(UserInputService.MouseBehavior),
+                tostring(UserInputService.MouseIconEnabled),
+                table.concat(modalNames, ",")
+            ))
+        end
+    end)
 end
 
 -- Custom watermark (WindUI has no draggable label)
