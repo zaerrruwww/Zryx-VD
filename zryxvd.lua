@@ -118,14 +118,13 @@ Window:SetUIScale(IsMobile and 1 or 0.85)
 -- buka/tutup lewat method ini). Polling Visible/Closed gagal karena
 -- frame luar tetap Visible saat close.
 if not IsMobile then
-    -- PENTING (ditemukan dari script game Violence District):
-    -- Game punya loop RenderStepped yg memaksa kursor SETIAP FRAME:
-    --   jc=true  (default di desktop) -> paksa Default (kursor bebas)
-    --   jc=false -> LockCenter saat di round (Team bukan spec/lobby + Health>0),
-    --               Default saat mati/spec/lobby.
-    -- BindToRenderStep(Last) KALAH karena semua bind jalan SEBELUM event
-    -- RenderStepped. Jadi kita pakai RenderStepped:Connect + Heartbeat yg
-    -- terdaftar SETELAH script game -> eksekusi setelah loop game -> menang.
+    -- DETEKSI MENU: pakai event resmi WindUI OnOpen/OnClose (Footagesus WindUI
+    -- tidak punya OnToggle seperti tree-hub; OnOpen/OnClose setara dan dipanggil
+    -- setiap buka/tutup termasuk via toggle key, minimize, tombol X).
+    -- KURSOR: game VD memaksa kursor setiap frame di loop RenderStepped-nya
+    -- (flag jc=true default di desktop -> paksa Default). BindToRenderStep KALAH
+    -- (jalan sebelum event RenderStepped), jadi kita pakai RenderStepped:Connect
+    -- + Heartbeat yg terdaftar SETELAH script game -> menang tiap frame.
     local menuOpen = true
 
     -- kondisi "di round" persis seperti yg dipakai game VD
@@ -145,12 +144,6 @@ if not IsMobile then
     end
 
     local function applyMouse()
-        local ok, closed = pcall(function()
-            return Window.Closed
-        end)
-        if ok and typeof(closed) == "boolean" then
-            menuOpen = closed == false
-        end
         if menuOpen then
             UserInputService.MouseBehavior = Enum.MouseBehavior.Default
             UserInputService.MouseIconEnabled = true
@@ -163,29 +156,32 @@ if not IsMobile then
         end
     end
 
-    -- bungkus Open/Close asli (Toggle, tombol minimize, tombol X -> semua
-    -- lewat Close; aw.Destroy() juga panggil aw:Close() dulu)
-    local oldOpen = Window.Open
-    local oldClose = Window.Close
-    if oldOpen then
-        Window.Open = function(self, ...)
-            local r = oldOpen(self, ...)
-            menuOpen = true
-            applyMouse()
-            return r
+    -- event resmi WindUI (setara OnToggle di contoh tree-hub)
+    pcall(function()
+        if Window.OnOpen then
+            Window:OnOpen(function()
+                menuOpen = true
+                applyMouse()
+            end)
         end
-    end
-    if oldClose then
-        Window.Close = function(self, ...)
-            local r = oldClose(self, ...)
-            menuOpen = false
-            applyMouse()
-            return r
+        if Window.OnClose then
+            Window:OnClose(function()
+                menuOpen = false
+                applyMouse()
+            end)
         end
-    end
+    end)
 
-    -- menang atas loop game: RenderStepped (setelah koneksi game) + Heartbeat
-    RunService.RenderStepped:Connect(applyMouse)
+    -- polling Window.Closed sebagai backup deteksi (diset sinkron di aw.Close/Open)
+    RunService.RenderStepped:Connect(function()
+        local ok, closed = pcall(function()
+            return Window.Closed
+        end)
+        if ok and typeof(closed) == "boolean" then
+            menuOpen = closed == false
+        end
+        applyMouse()
+    end)
     RunService.Heartbeat:Connect(applyMouse)
 end
 
