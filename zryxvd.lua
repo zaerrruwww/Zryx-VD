@@ -118,43 +118,70 @@ Window:SetUIScale(IsMobile and 1 or 0.85)
 -- buka/tutup lewat method ini). Polling Visible/Closed gagal karena
 -- frame luar tetap Visible saat close.
 if not IsMobile then
-    -- === KURSOR (pola Roblox Esc Menu) ===
-    --   menu buka  -> kursor bebas penuh (Default, icon muncul)
-    --   menu tutup -> kunci kursor (LockCenter, icon hilang) + klik simulasi di
-    --   tengah viewport utk sinyal modul kamera VD mengambil alih secara native.
+    -- === KURSOR ===
+    --   PRIORITAS MUTLAK: menu buka -> SELALU kursor bebas (Default + icon muncul),
+    --   tidak peduli lobby/round.
+    --   menu tutup + di match (hidup, bukan lobby/spectator/menu) -> kunci
+    --   (LockCenter, icon hilang, ForceHide).
+    --   menu tutup + lobby/mati/spectator -> bebas (Default).
+    -- DETEKSI MENU: hook input manual (pola user) — tombol toggle menu WindUI.
+    -- KURSOR: game VD punya loop RenderStepped yg memaksa kursor tiap frame;
+    -- kita force SETIAP FRAME lewat RenderStepped:Connect + Heartbeat yg
+    -- terdaftar SETELAH script game -> jalan terakhir (FIFO) -> menang.
+    local Players = game:GetService("Players")
     local GuiService = game:GetService("GuiService")
-    local VirtualInputManager = game:GetService("VirtualInputManager")
-    local Workspace = game:GetService("Workspace")
+    local LocalPlayer = Players.LocalPlayer
     local isMenuOpen = true
 
-    local function onToggleMenu(isOpen)
-        GuiService.SelectedObject = nil
+    -- LocalPlayer bisa nil saat load (teleport/join awal) -> refresh tiap frame
+    local function refreshLocalPlayer()
+        if not LocalPlayer then
+            LocalPlayer = Players.LocalPlayer
+        end
+    end
 
-        if isOpen then
+    local function isInMatch()
+        local lp = LocalPlayer
+        if not lp then
+            return false
+        end
+        local char = lp.Character
+        if not char or not char:FindFirstChildOfClass("Humanoid") then
+            return false
+        end
+        if char.Humanoid.Health <= 0 then
+            return false
+        end
+        local teamName = lp.Team and lp.Team.Name:lower() or ""
+        if teamName:find("lobby") or teamName:find("spec") or teamName:find("menu") then
+            return false
+        end
+        return true
+    end
+
+    local function applyCursorState()
+        refreshLocalPlayer()
+        if isMenuOpen then
+            -- ALWAYS free cursor when UI is open
             UserInputService.MouseBehavior = Enum.MouseBehavior.Default
             UserInputService.MouseIconEnabled = true
             UserInputService.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.None
         else
-            UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
-            UserInputService.MouseIconEnabled = false
-            UserInputService.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.ForceHide
-
-            -- Re-focus game camera input like Roblox Esc Menu
-            task.defer(function()
-                pcall(function()
-                    if Workspace.CurrentCamera then
-                        local vp = Workspace.CurrentCamera.ViewportSize
-                        VirtualInputManager:SendMouseButtonEvent(vp.X / 2, vp.Y / 2, 1, true, game, 0)
-                        task.wait(0.02)
-                        VirtualInputManager:SendMouseButtonEvent(vp.X / 2, vp.Y / 2, 1, false, game, 0)
-                    end
-                end)
-            end)
+            -- Only lock when actively in a round
+            if isInMatch() then
+                UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
+                UserInputService.MouseIconEnabled = false
+                UserInputService.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.ForceHide
+            else
+                UserInputService.MouseBehavior = Enum.MouseBehavior.Default
+                UserInputService.MouseIconEnabled = true
+                UserInputService.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.None
+            end
         end
     end
 
-    -- DETEKSI MENU: hook input manual (pola user) — tombol toggle menu WindUI.
-    -- Tidak bergantung API WindUI (OnToggle/OnOpen/OnClose) yg beda-beda versi.
+    -- DETEKSI MENU: hook input manual (pengganti OnToggle); key dibaca dinamis
+    -- dari ToggleKey WindUI -> sinkron otomatis dgn keybind "Toggle UI Key"
     local function getToggleKey()
         local ok, key = pcall(function()
             return Window.ToggleKey
@@ -165,9 +192,24 @@ if not IsMobile then
     UserInputService.InputBegan:Connect(function(input)
         if input.KeyCode == getToggleKey() then
             isMenuOpen = not isMenuOpen
-            onToggleMenu(isMenuOpen)
+            pcall(function()
+                GuiService.SelectedObject = nil
+            end)
+            applyCursorState()
         end
     end)
+
+    -- backup: polling Window.Closed tiap frame (kalau versi WindUI punya field ini)
+    RunService.RenderStepped:Connect(function()
+        local ok, closed = pcall(function()
+            return Window.Closed
+        end)
+        if ok and typeof(closed) == "boolean" then
+            isMenuOpen = closed == false
+        end
+        applyCursorState()
+    end)
+    RunService.Heartbeat:Connect(applyCursorState)
 end
 
 -- Custom watermark (WindUI has no draggable label)
