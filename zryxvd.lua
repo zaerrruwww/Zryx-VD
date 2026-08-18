@@ -207,18 +207,29 @@ if not IsMobile then
                 UserInputService.MouseIconEnabled = false
                 UserInputService.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.ForceHide
             else
-                -- Lobby: Free Cursor + Wake-up Lobby Camera Orbit
-                UserInputService.MouseBehavior = Enum.MouseBehavior.Default
-                UserInputService.MouseIconEnabled = true
-                UserInputService.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.None
+                -- Lobby State: DO NOT OVERRIDE ANYTHING! Pass through to VD's
+                -- native scripts. Only ensure OverrideMouseIconBehavior reset
+                -- ke None (sekali, idempotent).
+                if UserInputService.OverrideMouseIconBehavior ~= Enum.OverrideMouseIconBehavior.None then
+                    UserInputService.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.None
+                end
             end
-            -- Restore CameraType & kirim refocus pulse (round DAN lobby) —
-            -- hanya pada transisi buka->tutup, bukan tiap frame
+            -- Restore CameraType + CameraSubject native & kirim refocus pulse
+            -- (round DAN lobby) — hanya pada transisi buka->tutup, bukan tiap frame
             if wasMenuOpen then
                 pcall(function()
                     local cam = Workspace.CurrentCamera
                     if cam then
                         cam.CameraType = Enum.CameraType.Custom
+                        if not isInMatch() then
+                            local char = LocalPlayer and LocalPlayer.Character
+                            if char then
+                                local hum = char:FindFirstChildOfClass("Humanoid")
+                                if hum then
+                                    cam.CameraSubject = hum
+                                end
+                            end
+                        end
                     end
                 end)
                 sendRefocusPulse()
