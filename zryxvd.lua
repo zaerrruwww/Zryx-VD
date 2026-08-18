@@ -77,6 +77,21 @@ local Window = WindUI:CreateWindow({
     HideSearchBar = false,
     ScrollBarEnabled = false,
     SideBarWidth = 200,
+
+    -- KEY SYSTEM (bawaan WindUI): window utama terkunci sampai key valid.
+    -- CreateWindow BLOCK sampai key benar/skip (key tersimpan) -> cursor aman.
+    KeySystem = {
+        Key = { "demo123", "testing" }, -- ganti dgn key yg tampil di link key site kamu
+        SaveKey = true,                 -- key valid tersimpan -> next run skip
+        URL = "https://linkvertise.com/", -- GANTI: link key site kamu (tombol "Get key" copy link ini)
+        Title = "zryx | Key System",
+        Note = "Tekan <b>Get key</b>, buka link, salin key-nya, lalu submit.",
+        Thumbnail = {
+            Image = "rbxassetid://94272208451726",
+            Title = "zryx",
+            Width = 200,
+        },
+    },
     Topbar = {
         Height      = 44,
         ButtonsType = "Default",
