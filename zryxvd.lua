@@ -136,34 +136,33 @@ local RunService = game:GetService("RunService")
 
 Window:SetUIScale(IsMobile and 1 or 0.85)
 
--- === TOGGLE MENU CUSTOM (logo banner ukuran asli) ===
---   Logo asli berbentuk banner lebar (403x255) — jelek kalau dipaksa masuk
---   slot icon persegi 22px. Jadi pakai ImageButton custom dgn aspek asli:
---   draggable, auto-hide saat menu buka, klik = toggle menu.
-local LogoSize = IsMobile and UDim2.fromOffset(150, 95) or UDim2.fromOffset(172, 109)
+-- === TOGGLE MENU CUSTOM (logo bulat & kecil) ===
+local LogoSize = IsMobile and UDim2.fromOffset(48, 48) or UDim2.fromOffset(56, 56)
 local LogoBtn = Instance.new("ImageButton")
 LogoBtn.Name = "ZryxLogoBtn"
 LogoBtn.Image = "rbxassetid://72902239001553"
 LogoBtn.Size = LogoSize
 LogoBtn.AnchorPoint = Vector2.new(0, 1)
 LogoBtn.Position = UDim2.new(0, 24, 1, -24)
-LogoBtn.BackgroundTransparency = 1
+LogoBtn.BackgroundColor3 = Color3.fromRGB(188, 81, 93)
+LogoBtn.BackgroundTransparency = 0
+LogoBtn.ScaleType = Enum.ScaleType.Crop
 LogoBtn.AutoButtonColor = false
 local LogoCorner = Instance.new("UICorner")
-LogoCorner.CornerRadius = UDim.new(0, 14)
+LogoCorner.CornerRadius = UDim.new(1, 0)
 LogoCorner.Parent = LogoBtn
 local LogoStroke = Instance.new("UIStroke")
 LogoStroke.Color = Color3.fromRGB(255, 255, 255)
 LogoStroke.Thickness = 2
-LogoStroke.Transparency = 0.8
+LogoStroke.Transparency = 0.6
 LogoStroke.Parent = LogoBtn
--- fallback teks: kalau image logo gagal load di game, teks "zryx" yg tampil
+-- fallback: kalau image gagal load, lingkaran merah + "z" putih
 local LogoFallback = Instance.new("TextLabel")
 LogoFallback.Name = "ZryxLogoFallback"
 LogoFallback.Size = UDim2.fromScale(1, 1)
 LogoFallback.BackgroundTransparency = 1
-LogoFallback.Text = "zryx"
-LogoFallback.TextColor3 = Color3.fromRGB(188, 81, 93)
+LogoFallback.Text = "z"
+LogoFallback.TextColor3 = Color3.fromRGB(255, 255, 255)
 LogoFallback.TextSize = IsMobile and 22 or 26
 LogoFallback.Font = Enum.Font.GothamBold
 LogoFallback.Parent = LogoBtn
@@ -231,15 +230,6 @@ LogoBtn.MouseButton1Click:Connect(function()
         end)
     end
 end)
-
--- auto-hide saat menu buka (tombol selalu tampil — logo harus kelihatan)
--- RunService.RenderStepped:Connect(function()
---     local closed = true
---     pcall(function()
---         closed = Window.Closed
---     end)
---     LogoBtn.Visible = closed
--- end)
 
 -- === KEY MANAGER (control panel lokal) ===
 --   Kelola key di mesin sendiri: lihat key valid, tambah, hapus, reset key
