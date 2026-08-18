@@ -214,14 +214,14 @@ LogoBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- auto-hide saat menu buka
-RunService.RenderStepped:Connect(function()
-    local closed = true
-    pcall(function()
-        closed = Window.Closed
-    end)
-    LogoBtn.Visible = closed
-end)
+-- auto-hide saat menu buka (tombol selalu tampil — logo harus kelihatan)
+-- RunService.RenderStepped:Connect(function()
+--     local closed = true
+--     pcall(function()
+--         closed = Window.Closed
+--     end)
+--     LogoBtn.Visible = closed
+-- end)
 
 -- === KEY MANAGER (control panel lokal) ===
 --   Kelola key di mesin sendiri: lihat key valid, tambah, hapus, reset key
