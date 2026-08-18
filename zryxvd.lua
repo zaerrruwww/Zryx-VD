@@ -168,9 +168,16 @@ LogoFallback.TextSize = IsMobile and 22 or 26
 LogoFallback.Font = Enum.Font.GothamBold
 LogoFallback.Parent = LogoBtn
 local function parentLogoBtn()
-    local parent = (gethui and gethui()) or game:GetService("CoreGui")
-    LogoBtn.Parent = parent
-    print("[Zryx] LogoBtn parent:", tostring(parent))
+    -- BUNGKUS dalam ScreenGui sendiri — objek GUI langsung di bawah CoreGui
+    -- tidak dirender! Fallback ke PlayerGui (pola WindUI), bukan CoreGui.
+    local LogoGui = Instance.new("ScreenGui")
+    LogoGui.Name = "ZryxLogoGui"
+    LogoGui.ResetOnSpawn = false
+    LogoGui.IgnoreGuiInset = true
+    local parent = (gethui and gethui()) or (Players.LocalPlayer and Players.LocalPlayer:FindFirstChild("PlayerGui"))
+    LogoGui.Parent = parent
+    LogoBtn.Parent = LogoGui
+    print("[Zryx] LogoBtn parent:", tostring(parent), "| gui:", tostring(LogoGui.Parent))
 end
 pcall(parentLogoBtn)
 pcall(function()
