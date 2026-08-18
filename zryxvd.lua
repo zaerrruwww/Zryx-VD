@@ -146,16 +146,30 @@ if not IsMobile then
             return false
         end
         local char = lp.Character
-        if not char or not char:FindFirstChildOfClass("Humanoid") then
+        if not char or not char:FindFirstChildOfClass("Humanoid") or char.Humanoid.Health <= 0 then
             return false
         end
-        if char.Humanoid.Health <= 0 then
+
+        -- Team Check
+        if not lp.Team then
             return false
         end
-        local teamName = lp.Team and lp.Team.Name:lower() or ""
-        if teamName:find("lobby") or teamName:find("spec") or teamName:find("menu") then
+        local tName = lp.Team.Name:lower()
+        if tName:find("lobby") or tName:find("spec") or tName:find("menu") or tName:find("choos") then
             return false
         end
+
+        -- VD Internal Menu Check
+        local pGui = lp:FindFirstChild("PlayerGui")
+        if pGui then
+            for _, gName in ipairs({ "Menu", "Deploy", "Lobby", "DeployGui", "MainMenu" }) do
+                local gui = pGui:FindFirstChild(gName)
+                if gui and gui:IsA("ScreenGui") and gui.Enabled then
+                    return false
+                end
+            end
+        end
+
         return true
     end
 
