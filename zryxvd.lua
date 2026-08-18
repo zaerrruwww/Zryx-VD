@@ -66,7 +66,7 @@ local Window = WindUI:CreateWindow({
     Title   = "zryx",
     Author  = "Violence District - Freemium",
     Folder  = "zryx",
-    Icon    = "zap",
+    Icon    = "zryx:Logo",
     Theme   = "Dark",
     Acrylic = true,
     Transparent = true,
@@ -102,10 +102,9 @@ local Window = WindUI:CreateWindow({
         SaveKey = true,                 -- key valid tersimpan -> next run skip
         URL = KeySiteUrl,               -- tombol "Get key" copy link ini
         Title = "zryx | Key System",
-        Note = "Tekan <b>Get key</b>, buka link, salin key-nya, lalu submit.",
+        Note = "1. Klik <b>Get key</b> 2. Buka link 3. Salin key-nya 4. Submit",
         Thumbnail = {
             Image = "rbxassetid://72902239001553",
-            Title = "zryx",
             Width = 200,
         },
     },
@@ -121,10 +120,10 @@ local Window = WindUI:CreateWindow({
         Enabled = true,
         Draggable = true,
         OnlyMobile = false,
-        Scale = IsMobile and 1.35 or 1,
+        Scale = IsMobile and 1.35 or 1.15,
         Color = ColorSequence.new(
-            Color3.fromHex("#000000"),
-            Color3.fromHex("#000000")
+            Color3.fromHex("#FFFFFF"),
+            Color3.fromHex("#FFFFFF")
         ),
     },
     User = {

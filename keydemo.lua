@@ -47,7 +47,6 @@ local Window = WindUI:CreateWindow({
         -- Gambar samping (opsional)
         Thumbnail = {
             Image = "rbxassetid://72902239001553",
-            Title = "zryx",
             Width = 200,
         },
 
