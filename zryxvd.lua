@@ -66,7 +66,6 @@ local Window = WindUI:CreateWindow({
     Title   = "zryx",
     Author  = "Violence District - Freemium",
     Folder  = "zryx",
-    Icon    = "zryx:Logo",
     Theme   = "Dark",
     Acrylic = true,
     Transparent = true,
@@ -103,10 +102,6 @@ local Window = WindUI:CreateWindow({
         URL = KeySiteUrl,               -- tombol "Get key" copy link ini
         Title = "zryx | Key System",
         Note = "1. Klik <b>Get key</b> 2. Buka link 3. Salin key-nya 4. Submit",
-        Thumbnail = {
-            Image = "rbxassetid://72902239001553",
-            Width = 200,
-        },
     },
     Topbar = {
         Height      = 44,
@@ -117,7 +112,7 @@ local Window = WindUI:CreateWindow({
         Icon = "zryx:Logo",
         CornerRadius = UDim.new(1, 0),
         StrokeThickness = 3,
-        Enabled = true,
+        Enabled = false, -- toggle custom dgn logo banner (dibuat setelah window)
         Draggable = true,
         OnlyMobile = false,
         Scale = IsMobile and 1.35 or 1.15,
@@ -140,6 +135,93 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
 Window:SetUIScale(IsMobile and 1 or 0.85)
+
+-- === TOGGLE MENU CUSTOM (logo banner ukuran asli) ===
+--   Logo asli berbentuk banner lebar (403x255) — jelek kalau dipaksa masuk
+--   slot icon persegi 22px. Jadi pakai ImageButton custom dgn aspek asli:
+--   draggable, auto-hide saat menu buka, klik = toggle menu.
+local LogoSize = IsMobile and UDim2.fromOffset(150, 95) or UDim2.fromOffset(172, 109)
+local LogoBtn = Instance.new("ImageButton")
+LogoBtn.Name = "ZryxLogoBtn"
+LogoBtn.Image = "rbxassetid://72902239001553"
+LogoBtn.Size = LogoSize
+LogoBtn.AnchorPoint = Vector2.new(0, 1)
+LogoBtn.Position = UDim2.new(0, 24, 1, -24)
+LogoBtn.BackgroundTransparency = 1
+LogoBtn.AutoButtonColor = false
+local LogoCorner = Instance.new("UICorner")
+LogoCorner.CornerRadius = UDim.new(0, 14)
+LogoCorner.Parent = LogoBtn
+local LogoStroke = Instance.new("UIStroke")
+LogoStroke.Color = Color3.fromRGB(255, 255, 255)
+LogoStroke.Thickness = 2
+LogoStroke.Transparency = 0.8
+LogoStroke.Parent = LogoBtn
+local function parentLogoBtn()
+    local parent = (gethui and gethui()) or game:GetService("CoreGui")
+    LogoBtn.Parent = parent
+end
+pcall(parentLogoBtn)
+pcall(function()
+    if protectgui then
+        protectgui(LogoBtn)
+    end
+end)
+
+local LogoDrag, LogoDragInput, LogoStartPos, LogoStartMouse
+LogoBtn.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        LogoDrag = true
+        LogoStartPos = LogoBtn.Position
+        LogoStartMouse = input.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                LogoDrag = false
+            end
+        end)
+    end
+end)
+LogoBtn.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        LogoDragInput = input
+    end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if input == LogoDragInput and LogoDrag then
+        local delta = input.Position - LogoStartMouse
+        pcall(function()
+            LogoBtn.Position = UDim2.new(
+                LogoStartPos.X.Scale, LogoStartPos.X.Offset + delta.X,
+                LogoStartPos.Y.Scale, LogoStartPos.Y.Offset + delta.Y
+            )
+        end)
+    end
+end)
+
+LogoBtn.MouseButton1Click:Connect(function()
+    local closed = true
+    pcall(function()
+        closed = Window.Closed
+    end)
+    if closed then
+        pcall(function()
+            Window:Open()
+        end)
+    else
+        pcall(function()
+            Window:Close()
+        end)
+    end
+end)
+
+-- auto-hide saat menu buka
+RunService.RenderStepped:Connect(function()
+    local closed = true
+    pcall(function()
+        closed = Window.Closed
+    end)
+    LogoBtn.Visible = closed
+end)
 
 -- === KEY MANAGER (control panel lokal) ===
 --   Kelola key di mesin sendiri: lihat key valid, tambah, hapus, reset key
