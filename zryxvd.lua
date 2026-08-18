@@ -157,9 +157,20 @@ LogoStroke.Color = Color3.fromRGB(255, 255, 255)
 LogoStroke.Thickness = 2
 LogoStroke.Transparency = 0.8
 LogoStroke.Parent = LogoBtn
+-- fallback teks: kalau image logo gagal load di game, teks "zryx" yg tampil
+local LogoFallback = Instance.new("TextLabel")
+LogoFallback.Name = "ZryxLogoFallback"
+LogoFallback.Size = UDim2.fromScale(1, 1)
+LogoFallback.BackgroundTransparency = 1
+LogoFallback.Text = "zryx"
+LogoFallback.TextColor3 = Color3.fromRGB(188, 81, 93)
+LogoFallback.TextSize = IsMobile and 22 or 26
+LogoFallback.Font = Enum.Font.GothamBold
+LogoFallback.Parent = LogoBtn
 local function parentLogoBtn()
     local parent = (gethui and gethui()) or game:GetService("CoreGui")
     LogoBtn.Parent = parent
+    print("[Zryx] LogoBtn parent:", tostring(parent))
 end
 pcall(parentLogoBtn)
 pcall(function()
