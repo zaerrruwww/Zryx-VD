@@ -109,6 +109,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/zaerrruwww/zryx-vd/ma
 ## 📦 File Structure
 
 - `zryxvd.lua` – Main script, loads the WindUI library and runs all features.  
+- `keydemo.lua` – **Demo Key System** (WindUI built-in): key site link, key validation, save-key bypass (eksperimen branch only).  
 - *External dependencies*:  
   - [WindUI Library](https://github.com/Footagesus/WindUI) (loaded remotely)  
   - Built-in config system for UI theming and config persistence.
@@ -131,15 +132,18 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/zaerrruwww/zryx-vd/ma
 
 ## 📝 Changelog
 
+- **v1.2.0 (eksperimen)** – Key System demo
+  - Built-in WindUI Key System: key site URL (linkvertise), key validation, save-key file bypass
+  - `keydemo.lua` terpisah — belum masuk main script
+- **v1.1.0** – Mobile support  
+  - On-screen draggable **Mobile Aim Button** (hold to aim)  
+  - Full touch support for parry, skill checks and aimbot
 - **v1.0.0** – Initial release  
   - Aimbot, Aimlock & FOV with prediction  
   - Full ESP system with status  
   - Auto-parry, auto skill check, god mode  
   - No Clip, walk speed override, masked powers  
-  - Custom theme with save/load  
-  - **v1.1.0** – Mobile support  
-    - On-screen draggable **Mobile Aim Button** (hold to aim)  
-    - Full touch support for parry, skill checks and aimbot
+  - Custom theme with save/load
 
 ---
 
