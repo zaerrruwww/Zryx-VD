@@ -51,7 +51,7 @@ local UserInputService = game:GetService("UserInputService")
 local IsMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
 
 local ok, err = pcall(function()
-    WindUI.Creator:AddIcons("zryx", { Logo = "rbxassetid://72902239001553" })
+    WindUI.Creator.AddIcons("zryx", { Logo = "rbxassetid://72902239001553" })
 end)
 if not ok then
     warn("[zryx] failed to register logo icon: " .. tostring(err))
