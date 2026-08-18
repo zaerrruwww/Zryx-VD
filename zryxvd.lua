@@ -130,8 +130,28 @@ if not IsMobile then
     -- terdaftar SETELAH script game -> jalan terakhir (FIFO) -> menang.
     local Players = game:GetService("Players")
     local GuiService = game:GetService("GuiService")
+    local VirtualInputManager = game:GetService("VirtualInputManager")
+    local Workspace = game:GetService("Workspace")
     local LocalPlayer = Players.LocalPlayer
     local isMenuOpen = true
+    local wasMenuOpen = true
+
+    -- REFOCUS PULSE (pola Roblox Esc Menu): klik kiri di tengah viewport utk
+    -- membangunkan modul kamera VD (round: ambil alih & kunci native; lobby:
+    -- resume drag/orbit kamera). Dikirim SEKALI per transisi buka->tutup.
+    local function sendRefocusPulse()
+        task.defer(function()
+            pcall(function()
+                local cam = Workspace.CurrentCamera
+                if cam then
+                    local vp = cam.ViewportSize
+                    VirtualInputManager:SendMouseButtonEvent(vp.X / 2, vp.Y / 2, 1, true, game, 0)
+                    task.wait(0.02)
+                    VirtualInputManager:SendMouseButtonEvent(vp.X / 2, vp.Y / 2, 1, false, game, 0)
+                end
+            end)
+        end)
+    end
 
     -- LocalPlayer bisa nil saat load (teleport/join awal) -> refresh tiap frame
     local function refreshLocalPlayer()
@@ -187,11 +207,24 @@ if not IsMobile then
                 UserInputService.MouseIconEnabled = false
                 UserInputService.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.ForceHide
             else
+                -- Lobby: Free Cursor + Wake-up Lobby Camera Orbit
                 UserInputService.MouseBehavior = Enum.MouseBehavior.Default
                 UserInputService.MouseIconEnabled = true
                 UserInputService.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.None
             end
+            -- Restore CameraType & kirim refocus pulse (round DAN lobby) —
+            -- hanya pada transisi buka->tutup, bukan tiap frame
+            if wasMenuOpen then
+                pcall(function()
+                    local cam = Workspace.CurrentCamera
+                    if cam then
+                        cam.CameraType = Enum.CameraType.Custom
+                    end
+                end)
+                sendRefocusPulse()
+            end
         end
+        wasMenuOpen = isMenuOpen
     end
 
     -- DETEKSI MENU: hook input manual (pengganti OnToggle); key dibaca dinamis
