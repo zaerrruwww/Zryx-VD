@@ -51,11 +51,16 @@ local UserInputService = game:GetService("UserInputService")
 local IsMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
 
 local ok, err = pcall(function()
-    WindUI.Creator:AddIcons("zryx", { Logo = "rbxassetid://94272208451726" })
+    WindUI.Creator:AddIcons("zryx", { Logo = "rbxassetid://72902239001553" })
 end)
 if not ok then
     warn("[zryx] failed to register logo icon: " .. tostring(err))
 end
+
+-- === KEY SYSTEM: daftar key runtime (dikelola dari tab Key Manager) ===
+local ZryxKeys = { "demo123", "testing" }
+local KeySystemEnabled = true
+local KeySiteUrl = "https://linkvertise.com/" -- GANTI: link key site kamu
 
 local Window = WindUI:CreateWindow({
     Title   = "zryx",
@@ -80,14 +85,26 @@ local Window = WindUI:CreateWindow({
 
     -- KEY SYSTEM (bawaan WindUI): window utama terkunci sampai key valid.
     -- CreateWindow BLOCK sampai key benar/skip (key tersimpan) -> cursor aman.
+    -- Validasi lewat KeyValidator yg baca daftar runtime (ZryxKeys) sehingga
+    -- tab Key Manager bisa tambah/hapus key tanpa edit kode.
     KeySystem = {
-        Key = { "demo123", "testing" }, -- ganti dgn key yg tampil di link key site kamu
+        KeyValidator = function(input)
+            if not KeySystemEnabled then
+                return true -- key system dimatikan -> semua masuk
+            end
+            for _, k in ipairs(ZryxKeys) do
+                if tostring(k) == tostring(input) then
+                    return true
+                end
+            end
+            return false
+        end,
         SaveKey = true,                 -- key valid tersimpan -> next run skip
-        URL = "https://linkvertise.com/", -- GANTI: link key site kamu (tombol "Get key" copy link ini)
+        URL = KeySiteUrl,               -- tombol "Get key" copy link ini
         Title = "zryx | Key System",
         Note = "Tekan <b>Get key</b>, buka link, salin key-nya, lalu submit.",
         Thumbnail = {
-            Image = "rbxassetid://94272208451726",
+            Image = "rbxassetid://72902239001553",
             Title = "zryx",
             Width = 200,
         },
@@ -124,6 +141,116 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
 Window:SetUIScale(IsMobile and 1 or 0.85)
+
+-- === KEY MANAGER (control panel lokal) ===
+--   Kelola key di mesin sendiri: lihat key valid, tambah, hapus, reset key
+--   lokal (hapus file .key), dan on/off key system. Berlaku lokal saja.
+local KeyTab = Window:Tab({ Title = "Key Manager", Icon = "key" })
+
+local KeyStatus = KeyTab:Paragraph({
+    Title = "Key System",
+    Desc = "ON - minta key saat execute",
+})
+
+local KeySysToggle = KeyTab:Toggle({
+    Title = "Key System",
+    Desc = "OFF = tanpa key (semua langsung masuk)",
+    Value = true,
+    Callback = function(state)
+        KeySystemEnabled = state
+        pcall(function()
+            KeyStatus:SetDesc(state and "ON - minta key saat execute" or "OFF - tanpa key")
+        end)
+    end,
+})
+
+local function findKey(k)
+    for _, v in ipairs(ZryxKeys) do
+        if tostring(v) == tostring(k) then
+            return true
+        end
+    end
+    return false
+end
+
+local KeyListSection
+local function refreshKeyList()
+    if KeyListSection then
+        pcall(function()
+            KeyListSection:Destroy()
+        end)
+    end
+    KeyListSection = KeyTab:Section({ Title = "Key Valid (" .. #ZryxKeys .. ")" })
+    if #ZryxKeys == 0 then
+        KeyListSection:Paragraph({
+            Title = "Belum ada key",
+            Desc = "Tambah key baru di bawah.",
+        })
+    else
+        for i, k in ipairs(ZryxKeys) do
+            KeyListSection:Button({
+                Title = "Hapus  \"" .. tostring(k) .. "\"",
+                Desc = "Klik utk hapus key ini dari daftar",
+                Callback = function()
+                    table.remove(ZryxKeys, i)
+                    refreshKeyList()
+                end,
+            })
+        end
+    end
+end
+refreshKeyList()
+
+local PendingKey = ""
+local NewKeyInput = KeyTab:Input({
+    Title = "Key Baru",
+    Type = "Input",
+    Placeholder = "ketik key lalu Enter...",
+    Callback = function(value)
+        PendingKey = tostring(value):gsub("%s+", "")
+    end,
+})
+
+KeyTab:Button({
+    Title = "Tambah Key",
+    Desc = "Tambahkan key dari input di atas ke daftar valid",
+    Callback = function()
+        local k = PendingKey
+        if k ~= "" and not findKey(k) then
+            table.insert(ZryxKeys, k)
+            pcall(function()
+                NewKeyInput:Set("")
+            end)
+            PendingKey = ""
+            refreshKeyList()
+        end
+    end,
+})
+
+local function getKeyFilePath()
+    local id = (gethwid and gethwid()) or (Players.LocalPlayer and Players.LocalPlayer.UserId)
+    return "zryx/" .. tostring(id) .. ".key"
+end
+
+KeyTab:Button({
+    Title = "Reset Key Lokal",
+    Desc = "Hapus file key di mesin ini -> lain kali execute minta key lagi",
+    Callback = function()
+        local done = false
+        pcall(function()
+            if type(isfile) == "function" then
+                local p = getKeyFilePath()
+                if isfile(p) then
+                    delfile(p)
+                    done = true
+                end
+            end
+        end)
+        pcall(function()
+            KeyStatus:SetDesc(done and "Key lokal di-reset. Execute ulang utk tes." or "File key tidak ada / gagal hapus.")
+        end)
+    end,
+})
 
 -- === KURSOR ===
 --   menu buka  -> dipaksa bebas (Default)

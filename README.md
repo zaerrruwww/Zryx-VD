@@ -132,8 +132,9 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/zaerrruwww/zryx-vd/ma
 
 ## 📝 Changelog
 
-- **v1.2.0 (eksperimen)** – Key System
+- **v1.2.0 (eksperimen)** – Key System + Key Manager
   - Built-in WindUI Key System langsung di `zryxvd.lua`: key site URL (linkvertise), key validation, save-key file bypass
+  - Tab **Key Manager** (lokal): lihat/tambah/hapus key valid, reset key lokal, on/off key system
   - Window utama terkunci sampai key valid (CreateWindow block)
 - **v1.1.0** – Mobile support  
   - On-screen draggable **Mobile Aim Button** (hold to aim)  
